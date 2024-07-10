@@ -6,48 +6,11 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
 {
-    public function register(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'name' => 'required',
-            'email' => 'required|email|unique:users,email',
-            'username' => 'required',
-            'alamat' => 'required',
-            'telephone' => 'required|max:15',
-            'password' => 'required|min:6',
-            'confirm_password' => 'required|same:password'
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Terjadi Kesalahan',
-                'data' => $validator->errors()
-            ], 422); // Mengembalikan response dengan HTTP status code 422 (Unprocessable Entity)
-        }
-
-        $input = $request->all();
-        $input['password'] = bcrypt($input['password']);
-
-        $user = User::create($input);
-
-        $success['email'] = $user->email;
-        $success['name'] = $user->name;
-        $success['username'] = $user->username;
-        $success['alamat'] = $user->alamat;
-        $success['telephone'] = $user->telephone;
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Register Berhasil',
-            'data' => $success
-        ]);
-    }
-
     // public function login(Request $request)
     // {
     //     // dd($request);
@@ -71,6 +34,49 @@ class AuthController extends Controller
     //         ], 401); // Mengembalikan response dengan HTTP status code 401 (Unauthorized)
     //     }
     // }
+    public function register(Request $request)
+    {
+        $validatedData = $request->validate([
+            'name' => 'required',
+            'email' => 'required|email|unique:users,email',
+            'username' => 'required',
+            'alamat' => 'required',
+            'telephone' => 'required|max:15',
+            'password' => 'required|min:6',
+            'confirm_password' => 'required|same:password'
+        ]);
+
+        $user = User::create([
+            'name' => $validatedData['name'],
+            'email' => $validatedData['email'],
+            'username' => $validatedData['username'],
+            'alamat' => $validatedData['alamat'],
+            'telephone' => $validatedData['telephone'],
+            'email' => $validatedData['email'],
+            'password' => Hash::make($validatedData['password']),
+            'role' => 'User',
+        ]);
+
+        // $user->role = 'User';
+        // $user->save();
+
+        $token = $user->createToken('User')->plainTextToken;
+        
+        $cookieName = 'access_token';
+        $cookieLifetime = 60 * 24;
+
+        $cookie = cookie($cookieName, $token, $cookieLifetime);
+
+        $url = '/apps/dashboard';
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Registration successful',
+            'token' => $token,
+            'url' => $url
+        ])->withCookie($cookie);
+    }
+
 
      public function login(Request $request)
     {

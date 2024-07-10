@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API\User;
 
 use Exception;
+use App\Models\User;
 use App\Models\BuktiDonasi;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -10,10 +11,12 @@ use Illuminate\Support\Facades\File;
 
 class FormDonasiController extends Controller
 {
-    public function index()
+    public function index($id_user)
     {
         try {
-            $donasis = BuktiDonasi::all();
+            $user = User::findOrFail($id_user);
+
+            $donasis = BuktiDonasi::where('users_id', $id_user)->get();
             $url = '/admin/donasi';
 
             return response()->json([
@@ -23,6 +26,8 @@ class FormDonasiController extends Controller
                 'url' => $url,
             ]);
         } catch (Exception $e) {
+            Log::error('Failed to get donasi: ' . $e->getMessage());
+
             return response()->json([
                 'status' => 'error',
                 'message' => 'Failed to get donasi',
@@ -35,7 +40,6 @@ class FormDonasiController extends Controller
     {
         try {
             $validatedData = $request->validate([
-                'tanggal' => 'required|string|max:255',
                 'nominal' => 'required|string|max:255',
                 'deskripsi' => 'required|string',
                 'file' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,pdf,doc,docx,jpg,png|max:2048',
@@ -96,11 +100,9 @@ class FormDonasiController extends Controller
             $donasis = BuktiDonasi::findOrfail($id);
 
             $validatedData = $request->validate([
-                'tanggal' => 'required|string|max:255',
                 'nominal' => 'required|string|max:255',
                 'deskripsi' => 'required|string',
                 'file' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,pdf,doc,docx,jpg,png|max:2048',
-                'users_id' => 'required|integer|exists:users,id',
             ]);
 
             if ($request->hasFile('file')) {
@@ -112,7 +114,10 @@ class FormDonasiController extends Controller
                 $FileName = uniqid('donasi_') . '.' . $files->getClientOriginalExtension();
                 $files->move(public_path('file/donasi'), $FileName);
                 $validatedData['file'] = $FileName;
+            } else {
+                $validatedData['file'] = $donasis->file;
             }
+            
             $donasis->update($validatedData);
             $url = '/admin/donasi';
 

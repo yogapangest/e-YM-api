@@ -108,6 +108,8 @@ class KontenPenyaluranController extends Controller
                 $FileName = uniqid('kontenpenyaluran_') . '.' . $files->getClientOriginalExtension();
                 $files->move(public_path('file/kontenpenyaluran'), $FileName);
                 $validatedData['foto'] = $FileName;
+            } else {
+                $validatedData['foto'] = $donasis->file;
             }
             $kontenpenyalurans->update($validatedData);
             $url = '/apps/konten_penyaluran/view';

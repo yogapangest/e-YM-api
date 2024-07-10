@@ -109,7 +109,6 @@ class RekapDonasiController extends Controller
                 'nominal' => 'required|string|max:255',
                 'deskripsi' => 'required|string',
                 'file' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,pdf,doc,docx,jpg,png|max:2048',
-                'users_id' => 'required|integer|exists:users,id',
             ]);
 
             if ($request->hasFile('file')) {
@@ -121,6 +120,8 @@ class RekapDonasiController extends Controller
                 $fileName = uniqid('donasi_') . '.' . $file->getClientOriginalExtension();
                 $file->move(public_path('file/donasi'), $fileName);
                 $validatedData['file'] = $fileName;
+            } else {
+                $validatedData['file'] = $donasis->file;
             }
 
             $donasi->update($validatedData);

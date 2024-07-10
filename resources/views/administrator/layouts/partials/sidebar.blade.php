@@ -53,9 +53,9 @@
                     'index.edit.kprogram',
                 ];
                 $activeRoutesDonatur = [
-                    'index.view.datauser',
-                    'index.create.datauser',
-                    'index.edit.datauser',
+                    'index.view.datadonasi',
+                    'index.create.datadonasi',
+                    'index.edit.datadonasi',
                     'form.show.donasi_admin',
                     'form.create.donasi_admin',
                     'form.edit.donasi_admin',
@@ -95,7 +95,7 @@
 
 
                 <li class="{{ in_array(\Route::currentRouteName(), $activeRoutesDonatur) ? 'active' : '' }}">
-                    <a href="{{ route('index.view.datauser') }}" class="nav-link"><i class="fas fa-donate"></i>
+                    <a href="{{ route('index.view.datadonasi') }}" class="nav-link"><i class="fas fa-donate"></i>
                         <span>Data Donatur</span></a>
                 </li>
 

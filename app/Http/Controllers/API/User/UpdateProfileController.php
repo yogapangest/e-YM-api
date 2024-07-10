@@ -34,7 +34,7 @@ class UpdateProfileController extends Controller
         }
     }
 
-    
+
     public function update(Request $request)
     {
         $user = auth()->user(); // Mengambil user yang sedang login

@@ -25,14 +25,6 @@
                                         <a href="{{ route('index.create.distribusi') }}" style="float: right;"
                                             class="btn btn-round btn-primary mb-3">Tambah</a>
                                     </div>
-                                    {{-- <form>
-                                        <div class="input-group">
-                                            <input type="text" class="form-control" placeholder="Search">
-                                            <div class="input-group-btn">
-                                                <button class="btn btn-primary"><i class="fas fa-search"></i></button>
-                                            </div>
-                                        </div>
-                                    </form> --}}
                                     <form method="GET" action="{{ route('index.search.distribusi') }}">
                                         <div class="input-group">
                                             <input type="text" class="form-control" name="q" placeholder="Search"
@@ -64,86 +56,8 @@
                                             <th class="text-center">Aksi</th>
                                         </tr>
 
-                                        <tbody>
-                                            @if ($distribusis->count() > 0)
-                                                @foreach ($distribusis as $data)
-                                                    <tr>
-                                                        <td class="align-middle">{{ $loop->iteration }}</td>
-                                                        <td class="align-middle">{{ $data->program->nama }}</td>
-                                                        {{-- <td class="align-middle">{{ $data->tanggal->format('d M Y') }}</td> --}}
-                                                        <td class="align-middle">
-                                                            {{ \carbon\carbon::parse($data->tanggal)->translatedFormat('d F Y') }}
-                                                        </td>
-                                                        <td class="align-middle">{{ $data->tempat }}</td>
-                                                        <td class="align-middle">{{ $data->penerima_manfaat }}</td>
-                                                        <td class="align-middle">
-                                                            {{ number_format($data->anggaran, 0, ',', '.') }}</td>
-                                                        <td class="align-middle">
-                                                            {{ number_format($data->pengeluaran, 0, ',', '.') }}</td>
-                                                        {{-- <td class="align-middle">
-                                                            {{ number_format($data->totalbarang, 0, ',', '.') }}</td> --}}
-                                                        <td class="align-middle">
-                                                            {{ number_format($data->sisa, 0, ',', '.') }}</td>
-                                                        <td class="align-middle">
-                                                            @if ($data->file)
-                                                                <a
-                                                                    href="{{ asset('storage/distribusis/' . $data->file) }}">
-                                                                    <i class="fas fa-file-alt"
-                                                                        style="font-size:
-                                                                20px;"></i>
-                                                                </a>
-                                                            @else
-                                                                <i>No file uploaded.</i>
-                                                            @endif
-                                                        </td>
-                                                        <td class="align-middle">
-                                                            <div class="text-center">
-                                                                <!-- Menggunakan flexbox untuk membuat ikon sejajar -->
-                                                                <a href="{{ route('index.view.distribusibarang', $data->id) }}"
-                                                                    class="btn btn-primary ml-2">
-                                                                    <!-- Gunakan class ml-2 untuk margin kiri -->
-                                                                    <i class="fas fa-shopping-basket"></i>
-                                                                </a>
-                                                            </div>
-                                                        </td>
-                                                        <td class="align-middle">
-                                                            <div class="d-flex justify-content-end">
-                                                                <!-- Menggunakan flexbox untuk membuat ikon sejajar -->
-                                                                <a href="{{ route('index.edit.distribusi', $data->id) }}"
-                                                                    class="btn btn-primary ml-2">
-                                                                    <!-- Gunakan class ml-2 untuk margin kiri -->
-                                                                    <i class="fas fa-edit"></i>
-                                                                </a>
-                                                                {{-- <a href="{{ route('index.destroy.distribusi', $data->id) }}"
-                                                                    class="btn btn-danger ml-2">
-                                                                    <!-- Gunakan class ml-2 untuk margin kiri -->
-                                                                    <i class="fas fa-trash-alt"></i>
-                                                                </a> --}}
-
-                                                                <a href="#" class="btn btn-danger ml-2"
-                                                                    onclick="confirmDelete({{ $data->id }})">
-                                                                    <i class="fas fa-trash-alt"></i>
-                                                                </a>
-
-                                                                <form id="delete-form-{{ $data->id }}"
-                                                                    action="{{ route('index.destroy.distribusi', $data->id) }}"
-                                                                    method="POST" style="display: none;">
-                                                                    @csrf
-                                                                    @method('DELETE')
-                                                                </form>
-                                                            </div>
-                                                        </td>
-                                                    </tr>
-                                                @endforeach
-                                            @else
-                                                <tr>
-                                                    <td class="text-center" colspan="10">Data Distribusi Belum Diisi</td>
-                                                </tr>
-                                            @endif
-                                            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
-                                            <script src="{{ asset('js/hapus.js') }}"></script>
-
-                                            @include('sweetalert::alert')
+                                        <tbody id="table-distribusi">
+                                            {{-- data distribusi --}}
                                         </tbody>
 
                                     </table>
@@ -156,6 +70,139 @@
             </div>
         </section>
     </div>
+    <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4="
+        crossorigin="anonymous"></script>
+    <script>
+        $(document).ready(function() {
+            $.ajax({
+                url: '/api/admin/manajemen/distribusi',
+                method: 'GET',
+                success: function(data) {
+                    console.log(data)
+                    if (Array.isArray(data.distribusi)) {
+                        var tableBody = $('#table-distribusi');
+
+                        var index = 1;
+                        // Iterasi setiap kegiatan dalam data
+                        data.distribusi.forEach(function(distribusi) {
+
+                            var date = new Date(distribusi.tanggal);
+                            var formattedDate = formatTanggal(date);
+                            // Buat baris tabel baru
+                            var row = $('<tr></tr>');
+
+                            // Tambahkan data kolom
+                            row.append('<td>' + index + '</td>');
+                            row.append('<td>' + distribusi.program.nama_program + '</td>');
+                            row.append('<td>' + formattedDate + '</td>');
+                            row.append('<td>' + distribusi.tempat + '</td>');
+                            row.append('<td>' + distribusi.penerima_manfaat + '</td>');
+                            row.append('<td>' + formatRupiah(distribusi.anggaran) + '</td>');
+                            row.append('<td>' + formatRupiah(distribusi.pengeluaran) + '</td>');
+                            row.append('<td>' + formatRupiah(distribusi.sisa) + '</td>');
+
+
+                            var fileUrl = distribusi.file; // URL file
+
+                            if (!fileUrl) {
+                                fileUrl = null
+                                row.append('<td>' + null + '</td>');
+
+                            } else {
+                                // Tentukan tipe file berdasarkan ekstensi
+                                var fileExtension = fileUrl.split('.').pop().toLowerCase();
+
+                                if (['jpg', 'jpeg', 'png', 'gif'].includes(fileExtension)) {
+                                    // Jika file gambar, buat elemen img
+                                    row.append('<td><img src="' + '/file/distribusi/' +
+                                        fileUrl +
+                                        '" alt="' + distribusi.file +
+                                        '" style="width: 70px; height: auto; border-radius: 0;"></td>'
+                                    );
+                                } else if (fileExtension === 'pdf') {
+                                    // Jika file PDF, buat link untuk mengunduh
+                                    row.append('<td><a href="' + '/file/distribusi/' + fileUrl +
+                                        '" class="btn btn-primary"><i class="fas fa-file"></i></a></td>'
+                                    );
+                                }
+                            }
+                            // Tambahkan URL dinamis untuk ikon barang
+
+                            row.append('<td><a href="' + '/apps/distribusi_barang/view/' +
+                                distribusi
+                                .id +
+                                '" class="btn btn-primary"><i class="fas fa-shopping-cart"></i></a></td>'
+                            );
+
+                            row.append('<td><a href="' + '/apps/distribusi/' + distribusi.id +
+                                '/edit' +
+                                '" class="mr-1 btn btn-primary">Edit</a><button data-id="' +
+                                distribusi.id +
+                                '" class="btn btn-danger delete-button">Delete</button></td>'
+                            );
+
+
+                            // Tambahkan baris ke dalam tabel
+                            tableBody.append(row);
+
+                            index++;
+
+                        });
+
+                        $('.delete-button').on('click', function() {
+                            var distribusi = $(this).data('id');
+                            console.log(distribusi);
+                            deleteProgram(distribusi, $(this).closest('tr'));
+
+                        });
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('There has been a problem with your AJAX operation:', error);
+                }
+            });
+
+            function formatTanggal(date) {
+                var bulan = [
+                    "Januari", "Februari", "Maret", "April", "Mei", "Juni",
+                    "Juli", "Agustus", "September", "Oktober", "November", "Desember"
+                ];
+                var tanggal = date.getDate();
+                var bulanNama = bulan[date.getMonth()];
+                var tahun = date.getFullYear();
+                return tanggal + ' ' + bulanNama + ' ' + tahun;
+            }
+
+            function formatRupiah(number) {
+                return 'Rp ' + number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+            }
+
+            function deleteProgram(distribusi, row) {
+                if (confirm('Apa Anda yakin ingin menghapus distribusi ini?')) {
+                    $.ajax({
+                        url: '/api/admin/manajemen/distribusi/delete/' + distribusi,
+                        method: 'DELETE',
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        },
+                        success: function(response) {
+                            if (response.status === 'success') {
+                                alert('kegiatan deleted successfully');
+                                // Remove the kegiatan row from the table
+                                row.remove();
+
+                            } else {
+                                alert('Failed to delete distribusi');
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            console.error('There has been a problem with your AJAX operation:', error);
+                        }
+                    });
+                }
+            }
+        });
+    </script>
 @endsection
 
 @section('script')

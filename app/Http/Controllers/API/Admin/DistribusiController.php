@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\File;
 
 class DistribusiController extends Controller
 {
-    public function index()             
+    public function index()
     {
         try {
             $distribusis = Distribusi::with('Program')->get();
@@ -26,7 +26,7 @@ class DistribusiController extends Controller
             ]);
         } catch (Exception $e) {
             Log::error('Failed to get Distribusi: ' . $e->getMessage());
-            
+
             return response()->json([
                 'status' => 'error',
                 'message' => 'Failed to get distribusi',
@@ -44,7 +44,7 @@ class DistribusiController extends Controller
                 'penerima_manfaat' => 'required|string',
                 'anggaran' => 'required|string|max:128',
                 'pengeluaran' => 'required|string|max:128',
-                'file' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,pdf,doc,docx|max:2048',
+                'file' => 'nullable|mimes:jpeg,png,jpg,gif,svg,pdf,doc,docx|max:2048',
                 'programs_id' => 'required|exists:programs,id',
             ]);
 
@@ -64,9 +64,9 @@ class DistribusiController extends Controller
                     $validatedData['file'] = $fileName;
                 }
             }
-            
+
             $distribusis = Distribusi::create($validatedData);
-            $url = '/admin/distribusi';
+            $url = 'apps/admin/distribusi';
 
             return response()->json([
                 'status' => 'success',
@@ -92,7 +92,7 @@ class DistribusiController extends Controller
             ], 500);
         }
     }
-    
+
     public function edit($id)
     {
         try {
@@ -116,6 +116,7 @@ class DistribusiController extends Controller
 
     public function update(Request $request, $id)
     {
+        // dd($request);
         try {
             $distribusi = Distribusi::findOrFail($id);
 
@@ -125,7 +126,7 @@ class DistribusiController extends Controller
                 'penerima_manfaat' => 'required|string',
                 'anggaran' => 'required|numeric',
                 'pengeluaran' => 'required|numeric',
-                'file' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,pdf,doc,docx|max:2048',
+                'file' => 'nullable|mimes:jpeg,png,jpg,gif,svg,pdf,doc,docx|max:2048',
                 'programs_id' => 'required|exists:programs,id',
             ]);
 
@@ -173,7 +174,7 @@ class DistribusiController extends Controller
 
             $distribusis->delete();
             $url = '/admin/distribusi';
-            
+
             return response()->json([
                 'status' => 'success',
                 'message' => 'Distribusi has been removed',

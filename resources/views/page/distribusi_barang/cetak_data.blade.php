@@ -201,14 +201,6 @@
         </table>
     </div>
 
-    <!-- Tanggal -->
-
-    {{-- <table class="tanggal">
-        <div class="tanggal-box tanggal-right">
-            Banyuwangi, {{ \carbon\carbon::parse($barang->distribusi->tanggal)->format('d F Y') }}
-        </div>
-    </table> --}}
-
     <table class="tanggal">
         <div class="tanggal-box tanggal-right">
             Banyuwangi, {{ \Carbon\Carbon::now()->translatedFormat('d F Y') }}

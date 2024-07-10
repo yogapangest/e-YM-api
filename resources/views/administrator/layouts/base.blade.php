@@ -5,7 +5,9 @@
     <meta charset="UTF-8">
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, shrink-to-fit=no" name="viewport">
     <link rel="icon" type="image/x-icon" href="{{ asset('assets/img/e-YM.png') }}" />
-    <title>e-YM</title>
+    {{-- <title>e-YM</title> --}}
+    @yield('title')
+    @yield('css')
 
     <!-- General CSS Files -->
     <link rel="stylesheet" href="{{ asset('assets/modules/bootstrap/css/bootstrap.min.css') }}">
@@ -24,7 +26,7 @@
 
     {{-- <link rel="stylesheet" href="{{ asset('css/main.css') }}"> --}}
     <!-- Start GA -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-94034622-3"></script>
+    {{-- <script async src="https://www.googletagmanager.com/gtag/js?id=UA-94034622-3"></script> --}}
     <script>
         window.dataLayer = window.dataLayer || [];
 
@@ -73,8 +75,6 @@
     <script src="{{ asset('assets/js/custom.js') }}"></script>
 
     @include('sweetalert::alert')
-
-
 </body>
 
 </html>

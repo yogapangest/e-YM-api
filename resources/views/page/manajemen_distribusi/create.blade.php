@@ -15,8 +15,7 @@
                             <h4>Tambah Distribusi</h4>
                         </div>
                         <div class="card-body">
-                            <form id="distribusiForm" method="POST" action="{{ route('index.store.distribusi') }}"
-                                enctype="multipart/form-data">
+                            <form id="DistribusiForm" method="POST" enctype="multipart/form-data">
                                 @csrf
 
                                 <div class="form-group">
@@ -24,11 +23,6 @@
                                     <select id="programs_id" class="form-control @error('programs_id') is-invalid @enderror"
                                         name="programs_id">
                                         <option value="" selected disabled>Pilih Program</option>
-                                        @foreach ($program as $data)
-                                            <option value="{{ $data->id }}"
-                                                {{ old('programs_id') == $data->id ? 'selected' : '' }}>{{ $data->nama }}
-                                            </option>
-                                        @endforeach
                                     </select>
                                     @error('programs_id')
                                         <div id="programs_id" class="form-text">{{ $message }}</div>
@@ -112,4 +106,56 @@
             </div>
         </section>
     </div>
+    <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4="
+        crossorigin="anonymous"></script>
+    </script>
+    <script>
+        $(document).ready(function() {
+
+            // Load Program Data
+            $.ajax({
+                url: '/api/admin/manajemen/program',
+                method: 'GET',
+                success: function(data) {
+                    if (Array.isArray(data.program)) {
+                        var programDropdown = $('#programs_id');
+                        programDropdown.empty();
+                        programDropdown.append(
+                            '<option value="" selected disabled>Pilih Program</option>');
+                        data.program.forEach(function(program) {
+                            programDropdown.append(new Option(program.nama_program, program
+                            .id));
+                        });
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('There has been a problem with your AJAX operation:', error);
+                }
+            });
+
+            $('#DistribusiForm').submit(function(event) {
+                event.preventDefault();
+
+                var formData = new FormData(this);
+
+                $.ajax({
+                    url: '/api/admin/manajemen/distribusi',
+                    method: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    success: function(data) {
+                        window.location.href = '/apps/distribusi/view';
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('There has been a problem with your AJAX operation:',
+                            error);
+                    }
+                });
+            });
+        });
+    </script>
 @endsection

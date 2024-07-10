@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\File;
 
 class ArsipController extends Controller
 {
-    public function index()             
+    public function index()
     {
         try {
             $arsips = Arsip::with('Program','JenisArsip')->get();
@@ -38,7 +38,7 @@ class ArsipController extends Controller
 
         try {
             $validatedData = $request->validate([
-                'file' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,pdf,doc,docx|max:2048',
+                'file' => 'nullable|mimes:jpeg,png,jpg,gif,svg,pdf,doc,docx|max:2048',
                 'programs_id' => 'required|exists:programs,id',
                 'jenisarsips_id' => 'required|exists:jenis_arsips,id',
 
@@ -93,11 +93,12 @@ class ArsipController extends Controller
 
     public function update(Request $request, $id)
     {
+        // dd($request);
         try {
             $arsips = arsip::findOrfail($id);
 
             $validatedData = $request->validate([
-                'file' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,pdf,doc,docx|max:2048',
+                'file' => 'nullable|mimes:jpeg,png,jpg,gif,svg,pdf,doc,docx|max:2048',
                 'programs_id' => 'required|exists:programs,id',
                 'jenisarsips_id' => 'required|exists:jenis_arsips,id',
             ]);
@@ -108,7 +109,7 @@ class ArsipController extends Controller
                 }
 
                 $files = $request->file('file');
-                $FileName = uniqid('arsip_') . '.' . $file->getClientOriginalExtension();
+                $FileName = uniqid('arsip_') . '.' . $files->getClientOriginalExtension();
                 $files->move(public_path('file/arsip'), $FileName);
                 $validatedData['file'] = $FileName;
             }
@@ -141,9 +142,9 @@ class ArsipController extends Controller
 
             $arsips->delete();
             $url = '/admin/arsip';
-            
+
             return response()->json([
-                'status' => 'seccess',
+                'status' => 'success',
                 'message' => 'arsip has been removed',
                 'url' => $url,
             ]);

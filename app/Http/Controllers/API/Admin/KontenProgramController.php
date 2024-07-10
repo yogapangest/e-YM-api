@@ -103,12 +103,12 @@ class KontenProgramController extends Controller
                 }
 
                 $files = $request->file('foto');
-                $FileName = uniqid('kontenprogram_') . '.' . $file->getClientOriginalExtension();
+                $FileName = uniqid('kontenprogram_') . '.' . $files->getClientOriginalExtension();
                 $files->move(public_path('file/kontenprogram'), $FileName);
                 $validatedData['foto'] = $FileName;
             }
             $kontenprograms->update($validatedData);
-            $url = '/admin/kontenprogram';
+            $url = '/apps/konten_program/view';
 
             return response()->json([
                 'status' => 'success',
@@ -136,9 +136,9 @@ class KontenProgramController extends Controller
 
             $kontenprograms->delete();
             $url = '/admin/kontenprogram';
-            
+
             return response()->json([
-                'status' => 'seccess',
+                'status' => 'success',
                 'message' => 'Konten program has been removed',
                 'url' => $url,
             ]);

@@ -12,9 +12,9 @@
                             <h4>Tambah Data Barang</h4>
                         </div>
                         <div class="card-body">
-                            <form method="POST" action="{{ route('index.store.distribusibarang', $distribusi_id) }}">
+                            <form id="DistribusiBarangForm" method="POST" action="#">
                                 @csrf
-                                <input type="hidden" name="distribusi_id" value="{{ $distribusi_id }}">
+                                <input type="hidden" name="distribusis_id" value="#">
 
                                 <div class="form-group">
                                     <label for="nama_barang">Nama Barang</label>
@@ -40,9 +40,9 @@
                                     <select id="satuan" class="form-control @error('satuan') is-invalid @enderror"
                                         name="satuan">
                                         <option value="">Pilih Satuan</option>
-                                        <option value="Nota" {{ old('satuan') == 'Nota' ? 'selected' : '' }}>Nota</option>
-                                        <option value="Kwitansi" {{ old('satuan') == 'Kwitansi' ? 'selected' : '' }}>
-                                            Kwitansi</option>
+                                        <option value="Nota">Nota</option>
+                                        <option value="Kwitansi">Kwitansi</option>
+
                                     </select>
                                     @error('satuan')
                                         <div id="satuan" class="form-text">{{ $message }}</div>
@@ -96,4 +96,40 @@
             </div>
         </section>
     </div>
+    <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4="
+        crossorigin="anonymous"></script>
+    <script>
+        $(document).ready(function() {
+            var distribusiId = window.location.pathname.split('/').pop();
+
+            $('#DistribusiBarangForm').submit(function(event) {
+                event.preventDefault();
+
+                var formData = new FormData(this);
+                formData.append('distribusis_id', distribusiId);
+                formData.append('nama_barang', $('#nama_barang').val());
+                formData.append('volume', $('#volume').val());
+                formData.append('satuan', $('#satuan').val());
+                formData.append('harga_satuan', $('#harga_satuan').val());
+
+                $.ajax({
+                    url: '/api/admin/manajemen/distribusi-barang/',
+                    method: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    success: function(data) {
+                        window.location.href = '/apps/distribusi_barang/view/' + distribusiId;
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('There has been a problem with your AJAX operation:',
+                            error);
+                    }
+                });
+            });
+        });
+    </script>
 @endsection

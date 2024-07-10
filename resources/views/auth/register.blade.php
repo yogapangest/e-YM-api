@@ -15,13 +15,13 @@
                             </div>
 
                             <div class="card-body">
-                                <form method="POST" action="{{ route('registration') }}" class="needs-validation"
-                                    novalidate="">
+                                <form id="RegisterForm" method="POST" class="needs-validation" novalidate=""
+                                    enctype="multipart/form-data">
                                     @csrf
                                     <div class="form-group">
                                         <label for="email">Email</label>
                                         <input id="email" type="email" class="form-control" name="email"
-                                            tabindex="3" required>
+                                            tabindex="3" required autofocus>
                                         <div class="invalid-feedback">
                                             Please fill in a valid email address.
                                         </div>
@@ -31,7 +31,7 @@
                                             <div class="form-group">
                                                 <label for="name">Nama</label>
                                                 <input id="name" type="text" class="form-control" name="name"
-                                                    tabindex="1" required autofocus>
+                                                    tabindex="1" required>
                                                 <div class="invalid-feedback">
                                                     Please fill in your name.
                                                 </div>
@@ -53,7 +53,7 @@
                                             <div class="form-group">
                                                 <label for="alamat">Alamat</label>
                                                 <input id="alamat" type="text" class="form-control" name="alamat"
-                                                    tabindex="1" required autofocus>
+                                                    tabindex="1" required>
                                                 <div class="invalid-feedback">
                                                     Please fill in your alamat.
                                                 </div>
@@ -84,9 +84,9 @@
                                         </div>
                                         <div class="col-lg-6">
                                             <div class="form-group">
-                                                <label for="password_confirmation">Konfirmasi Password</label>
-                                                <input id="password_confirmation" type="password" class="form-control"
-                                                    name="password_confirmation" tabindex="5" required>
+                                                <label for="confirm_password">Konfirmasi Password</label>
+                                                <input id="confirm_password" type="password" class="form-control"
+                                                    name="confirm_password" tabindex="5" required>
                                                 <div class="invalid-feedback">
                                                     Please fill in the confirmation password.
                                                 </div>
@@ -110,4 +110,43 @@
             </div>
         </section>
     </div>
+    <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4="
+        crossorigin="anonymous"></script>
+    <script>
+        $(document).ready(function() {
+            $('#RegisterForm').submit(function(event) {
+                event.preventDefault();
+                var email = $('#email').val();
+                var email = $('#name').val();
+                var email = $('#username').val();
+                var email = $('#alamat').val();
+                var email = $('#telephone').val();
+                var password = $('#password').val();
+                var password = $('#confirm_password').val();
+
+                var requestData = {
+                    email: email,
+                    password: password
+                };
+
+                $.ajax({
+                    url: '/api/register',
+                    method: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(requestData),
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    success: function(data) {
+                        console.log(data);
+                        window.location.href = data.url;
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('There has been a problem with your AJAX operation:',
+                            error);
+                    }
+                });
+            });
+        });
+    </script>
 @endsection

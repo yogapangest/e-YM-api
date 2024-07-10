@@ -32,7 +32,9 @@ use App\Http\Controllers\Administrator\Dashboard\DashboardController;
 Route::middleware('guest')->group( function() {
     Route::get('auth',[AuthController::class, 'index'])->name('auth');
     Route::post('login',[AuthController::class, 'login'])->name('login');
-    Route::get('register',[AuthController::class, 'register'])->name('register');
+    Route::get('register', function(){
+        return view('auth.register');
+    })->name('register');
     Route::post('registration',[AuthController::class, 'registration'])->name('registration');
 });
 
@@ -44,22 +46,28 @@ Route::prefix('apps')->middleware(['auth:sanctum', 'CheckRole:Admin;User'])->gro
     })->name('apps.dashboard');
 
     //manajemen distribusi
-    Route::get('/distribusi/view',[DistribusiController::class, 'index'])->name('index.view.distribusi');
-    Route::get('/distribusi/create',[DistribusiController::class, 'create'])->name('index.create.distribusi');
-    Route::post('/distribusi/store',[DistribusiController::class, 'store'])->name('index.store.distribusi');
-    Route::get('/distribusi/{id_distribusi}/edit',[DistribusiController::class, 'edit'])->name('index.edit.distribusi');
-    Route::put('/distribusi/{id_distribusi}/update',[DistribusiController::class, 'update'])->name('index.update.distribusi');
-    Route::delete('/distribusi/{id_distribusi}/destroy',[DistribusiController::class, 'destroy'])->name('index.destroy.distribusi');
+    Route::get('/distribusi/view', function(){
+        return view('page.manajemen_distribusi.index');
+    })->name('index.view.distribusi');
+    Route::get('/distribusi/create',function(){
+        return view('page.manajemen_distribusi.create');
+    })->name('index.create.distribusi');
+    Route::get('/distribusi/{id_distribusi}/edit',function(){
+        return view('page.manajemen_distribusi.edit');
+    })->name('index.edit.distribusi');
     Route::get('/distribusi/search', [DistribusiController::class, 'search'])->name('index.search.distribusi');
 
 
     //manajemen distribusi_barang
-    Route::get('/distribusi_barang/view/{id_distribusi}',[DistribusiBarangController::class, 'index'])->name('index.view.distribusibarang');
-    Route::get('/distribusi_barang/create/{id_distribusi}',[DistribusiBarangController::class, 'create'])->name('index.create.distribusibarang');
-    Route::post('/distribusi_barang/store/{id_distribusi}',[DistribusiBarangController::class, 'store'])->name('index.store.distribusibarang');
-    Route::get('/distribusi_barang/edit/{id_distribusi}',[DistribusiBarangController::class, 'edit'])->name('index.edit.distribusibarang');
-    Route::put('/distribusi_barang/update/{id_distribusi}',[DistribusiBarangController::class, 'update'])->name('index.update.distribusibarang');
-    Route::delete('/distribusi_barang/destroy/{id_distribusi}',[DistribusiBarangController::class, 'destroy'])->name('index.destroy.distribusibarang');
+    Route::get('/distribusi_barang/view/{id_distribusi}',function(){
+        return view('page.distribusi_barang.index');
+    })->name('index.view.distribusibarang');
+    Route::get('/distribusi_barang/create/{id_distribusi}',function(){
+        return view('page.distribusi_barang.create');
+    })->name('index.create.distribusibarang');
+    Route::get('/distribusi_barang/edit/{id_distribusi}', function(){
+        return view('page.distribusi_barang.edit');
+    })->name('index.edit.distribusibarang');
 
     // manajemen program
     Route::get('/program/view',function(){
@@ -95,12 +103,15 @@ Route::prefix('apps')->middleware(['auth:sanctum', 'CheckRole:Admin;User'])->gro
     })->name('index.edit');
 
     //manajemen arsip
-    Route::get('/arsip/view',[ArsipController::class, 'index'])->name('index.view.arsip');
-    Route::get('/arsip/create',[ArsipController::class, 'create'])->name('index.create.arsip');
-    Route::post('/arsip/store',[ArsipController::class, 'store'])->name('index.store.arsip');
-    Route::get('/arsip/{id}/edit',[ArsipController::class, 'edit'])->name('index.edit.arsip');
-    Route::put('/arsip/{id}/update',[ArsipController::class, 'update'])->name('index.update.arsip');
-    Route::delete('/arsip/{id}/destroy',[ArsipController::class, 'destroy'])->name('index.destroy.arsip');
+    Route::get('/arsip/view',function(){
+        return view('page.manajemen_arsip.index');
+    })->name('index.view.arsip');
+    Route::get('/arsip/create', function(){
+        return view('page.manajemen_arsip.create');
+    })->name('index.create.arsip');
+    Route::get('/arsip/{id}/edit', function(){
+        return view('page.manajemen_arsip.edit');
+    })->name('index.edit.arsip');
 
     //form data donasi(admin)
     Route::get('/donasi/{user_id}', [AdminDonasiController::class, 'show'])->name('form.show.donasi_admin');
@@ -119,7 +130,9 @@ Route::prefix('apps')->middleware(['auth:sanctum', 'CheckRole:Admin;User'])->gro
 
 
     //manajemen data_donasi
-    Route::get('/data_donasi/view',[DataDonasiController::class, 'index'])->name('index.view.datadonasi');
+    Route::get('/data_donasi/view',function(){
+        return view('page.manajemen_data_donasi.index');
+    })->name('index.view.datadonasi');
     Route::get('/data_donasi/create',[DataDonasiController::class, 'create'])->name('index.create.datadonasi');
     Route::post('/data_donasi/store',[DataDonasiController::class, 'store'])->name('index.store.datadonasi');
     Route::get('/data_donasi/{id}/edit',[DataDonasiController::class, 'edit'])->name('index.edit.datadonasi');
@@ -154,12 +167,15 @@ Route::prefix('apps')->middleware(['auth:sanctum', 'CheckRole:Admin;User'])->gro
     })->name('index.edit.penyaluran');
 
     //konten program
-    Route::get('/konten_program/index',[KontenProgramController::class, 'index'])->name('index.view.kprogram');
-    Route::get('/konten_program/create',[KontenProgramController::class, 'create'])->name('index.create.kprogram');
-    Route::post('/konten_program/store',[KontenProgramController::class, 'store'])->name('index.store.kprogram');
-    Route::get('/konten_program/{id}/edit',[KontenProgramController::class, 'edit'])->name('index.edit.kprogram');
-    Route::put('/konten_program/{id}/update',[KontenProgramController::class, 'update'])->name('index.update.kprogram');
-    Route::delete('/konten_program/{id}/destroy',[KontenProgramController::class, 'destroy'])->name('index.destroy.kprogram');
+    Route::get('/konten_program/view', function(){
+        return view('page.konten_program.index');
+    })->name('index.view.kprogram');
+    Route::get('/konten_program/create',function(){
+        return view('page.konten_program.create');
+    })->name('index.create.kprogram');
+    Route::get('/konten_program/{id}/edit',function(){
+        return view('page.konten_program.edit');
+    })->name('index.edit.kprogram');
 
     //logout
     Route::get('logout',[AuthController::class, 'logout'])->name('logout');

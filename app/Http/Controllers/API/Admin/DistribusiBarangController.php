@@ -7,6 +7,7 @@ use App\Models\Distribusi;
 use Illuminate\Http\Request;
 use App\Models\DistribusiBarang;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\File;
 
 class DistribusiBarangController extends Controller
 {
@@ -16,13 +17,16 @@ class DistribusiBarangController extends Controller
         try {
             $distribusi = Distribusi::findOrFail($distribusis_id);
             $distribusibarangs = DistribusiBarang::where('distribusis_id', $distribusis_id)->get();
+            $program = $distribusi->program->first();
             $url = '/admin/distribusibarangs';
+
 
             return response()->json([
                 'status' => 'success',
                 'message' => 'Get data distribusi barang successful',
                 'distribusi' => $distribusi,
                 'distribusibarangs' => $distribusibarangs,
+                'program' => $program,
                 'url' => $url,
             ]);
         } catch (Exception $e) {
@@ -43,7 +47,7 @@ class DistribusiBarangController extends Controller
                 'distribusis_id' => 'required|exists:distribusis,id',
                 'nama_barang' => 'required',
                 'volume' => 'required|numeric',
-                'satuan' => 'required|in:nota,kuitansi', // Validasi khusus untuk field satuan
+                'satuan' => 'required', // Validasi khusus untuk field satuan
                 'harga_satuan' => 'required|numeric',
             ]);
 
@@ -112,13 +116,15 @@ class DistribusiBarangController extends Controller
 
     public function update(Request $request, $id)
 {
+
+    // dd($request);
     try {
         // Validasi data yang diterima
         $validatedData = $request->validate([
-            'distribusis_id' => 'required|exists:distribusis,id',
+            'distribusis_id' => 'required',
             'nama_barang' => 'required',
             'volume' => 'required|numeric',
-            'satuan' => 'required|in:nota,kuitansi', // Validasi khusus untuk field satuan
+            'satuan' => 'required', // Validasi khusus untuk field satuan
             'harga_satuan' => 'required|numeric',
         ]);
 
@@ -145,9 +151,11 @@ class DistribusiBarangController extends Controller
 
         // Update data distribusi barang di database
         $distribusiBarang = DistribusiBarang::findOrFail($id);
+
+        // dd($distribusi, $distribusiBarang);
         $distribusiBarang->update($validatedData);
 
-        $url = '/admin/distribusibarangs';
+        $url = sprintf('/apps/distribusi_barang/view/%d', $validatedData['distribusis_id']);
 
         return response()->json([
             'status' => 'success',
@@ -176,7 +184,7 @@ class DistribusiBarangController extends Controller
 
             $distribusibarangs->delete();
             $url = '/admin/distribusibarangs';
-            
+
             return response()->json([
                 'status' => 'seccess',
                 'message' => 'distribusi barang has been removed',

@@ -13,13 +13,13 @@ class JenisArsipController extends Controller
     {
         try {
             $jenisarsips = JenisArsip::all();
-            $url = '/apps/admin/jenisarsip';
+            // $url = '/apps/admin/jenisarsip';
 
             return response()->json([
                 'status' => 'succes',
                 'message' => 'Get data jenisarsip successfull',
                 'jenisarsip' => $jenisarsips,
-                'url' => $url,
+                // 'url' => $url,
             ]);
         } catch (Exception $e) {
             return response()->json([

@@ -8,7 +8,6 @@ use Illuminate\Database\Eloquent\Model;
 class Distribusi extends Model
 {
     use HasFactory;
-    // protected $primaryKey = 'distribusis_id';
 
     protected $fillable = [
         'tanggal',

@@ -100,7 +100,8 @@
                                 } else if (fileExtension === 'pdf') {
                                     // Jika file PDF, buat link untuk mengunduh
                                     row.append('<td><a href="' + '/file/program/' + fileUrl +
-                                        '" target="_blank">Lihat File</a></td>');
+                                        '" class="btn btn-primary"><i class="fas fa-file"></i></a></td>'
+                                        );
                                 }
                             }
 

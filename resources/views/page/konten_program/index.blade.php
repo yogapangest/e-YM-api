@@ -14,15 +14,6 @@
     <!-- Main Content -->
     <div class="main-content">
         <section class="section">
-            {{-- <div class="section-header">
-                <h1>Table</h1>
-                <div class="section-header-breadcrumb">
-                    <div class="breadcrumb-item active"><a href="#">Dashboard</a></div>
-                    <div class="breadcrumb-item"><a href="#">Components</a></div>
-                    <div class="breadcrumb-item">Table</div>
-                </div>
-            </div> --}}
-
             <div class="section-body">
                 <div class="row pt-2">
                     <div class="col-12">
@@ -53,61 +44,8 @@
                                             <th class="text-center">Foto</th>
                                             <th class="text-center">aksi</th>
                                         </tr>
-                                        <tbody>
-                                            @if ($KontenProgram->count() > 0)
-                                                @foreach ($KontenProgram as $data)
-                                                    <tr>
-                                                        <td class="align-middle">{{ $loop->iteration }}</td>
-                                                        <td class="align-middle">{{ $data->nama }}</td>
-                                                        <td
-                                                            class="align-middle d-flex justify-content-center align-content-center">
-                                                            @if ($data->foto)
-                                                                <img src="{{ asset('storage/' . $data->foto) }}"
-                                                                    alt="Foto Konten"
-                                                                    style="width: 100px; margin-top: 10px; margin-bottom: 10px;">
-                                                            @else
-                                                                <i>No file uploaded.</i>
-                                                            @endif
-                                                        </td>
-                                                        <td class="align-middle">
-                                                            <div class="d-flex justify-content-center">
-                                                                <!-- Menggunakan flexbox untuk membuat ikon sejajar -->
-                                                                <a href="{{ route('index.edit.kprogram', $data->id) }}"
-                                                                    class="btn btn-primary ml-2">
-                                                                    <!-- Gunakan class ml-2 untuk margin kiri -->
-                                                                    <i class="fas fa-edit"></i>
-                                                                </a>
-                                                                {{-- <a href="{{ route('index.destroy.kprogram', $data->id) }}"
-                                                                    class="btn btn-danger ml-2">
-                                                                    <!-- Gunakan class ml-2 untuk margin kiri -->
-                                                                    <i class="fas fa-trash-alt"></i>
-                                                                </a> --}}
-
-                                                                <a href="#" class="btn btn-danger ml-2"
-                                                                    onclick="confirmDelete({{ $data->id }})">
-                                                                    <i class="fas fa-trash-alt"></i>
-                                                                </a>
-
-                                                                <form id="delete-form-{{ $data->id }}"
-                                                                    action="{{ route('index.destroy.kprogram', $data->id) }}"
-                                                                    method="POST" style="display: none;">
-                                                                    @csrf
-                                                                    @method('DELETE')
-                                                                </form>
-                                                            </div>
-                                                        </td>
-                                                    </tr>
-                                                @endforeach
-                                            @else
-                                                <tr>
-                                                    <td class="text-center" colspan="4">Konten Program Belum Diisi
-                                                    </td>
-                                                </tr>
-                                            @endif
-                                            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
-                                            <script src="{{ asset('js/hapus.js') }}"></script>
-
-                                            @include('sweetalert::alert')
+                                        <tbody id="table-konten-program">
+                                            {{-- data konten program --}}
                                         </tbody>
 
                                     </table>
@@ -120,6 +58,89 @@
             </div>
         </section>
     </div>
+    <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4="
+        crossorigin="anonymous"></script>
+    <script>
+        $(document).ready(function() {
+            $.ajax({
+                url: '/api/admin/manajemen/kontenprogram',
+                method: 'GET',
+                success: function(data) {
+                    if (Array.isArray(data.kontenprogram)) {
+                        var tableBody = $('#table-konten-program');
+
+                        var index = 1;
+                        // Iterasi setiap kegiatan dalam data
+                        data.kontenprogram.forEach(function(konten_program) {
+                            // Buat baris tabel baru
+                            var row = $('<tr></tr>');
+
+                            // Tambahkan data kolom
+                            row.append('<td>' + index + '</td>');
+                            row.append('<td>' + konten_program.nama_kontenprogram + '</td>');
+
+                            var imagePath = '/file/kontenprogram/' + konten_program.foto;
+                            console.log(imagePath);
+                            row.append('<td><img src="' + imagePath +
+                                '" style="width: 70px; height: auto; border-radius: 0;"></td>'
+                            );
+
+                            row.append('<td><a href="' + '/apps/konten_program/' +
+                                konten_program
+                                .id +
+                                '/edit' +
+                                '" class="mr-1 btn btn-primary">Edit</a><button data-id="' +
+                                konten_program.id +
+                                '" class="btn btn-danger delete-button">Delete</button></td>'
+                            );
+
+
+                            // Tambahkan baris ke dalam tabel
+                            tableBody.append(row);
+
+                            index++;
+
+                        });
+
+                        $('.delete-button').on('click', function() {
+                            var id_konten_program = $(this).data('id');
+                            console.log(id_konten_program);
+                            deleteProgram(id_konten_program, $(this).closest('tr'));
+
+                        });
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('There has been a problem with your AJAX operation:', error);
+                }
+            });
+
+            function deleteProgram(id_konten_program, row) {
+                if (confirm('Apa Anda yakin ingin menghapus konten program ini?')) {
+                    $.ajax({
+                        url: '/api/admin/manajemen/kontenprogram/delete/' + id_konten_program,
+                        method: 'DELETE',
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        },
+                        success: function(response) {
+                            if (response.status === 'success') {
+                                alert('Konten program deleted successfully');
+                                // Remove the kegiatan row from the table
+                                row.remove();
+
+                            } else {
+                                alert('Failed to delete Konten Program');
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            console.error('There has been a problem with your AJAX operation:', error);
+                        }
+                    });
+                }
+            }
+        });
+    </script>
 @endsection
 
 @section('script')

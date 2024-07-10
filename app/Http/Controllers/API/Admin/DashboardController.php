@@ -86,25 +86,10 @@ class DashboardController extends Controller
 
         $donationDataAdmin = $monthlyDonationsFinal;
 
-        // return response()->json([
-        //     'totalDistribusi' => $totalDistribusi,
-        //     'totalArsip' => $totalArsip,
-        //     'totalDonatur' => $totalDonatur,
-        //     'totalProgram' => $totalProgram,
-        //     'totalGuest' => $totalGuest,
-        //     'totalDonasiFormatted' => $totalDonasiFormatted,
-        //     'donationData' => $donationData,
-        //     'months' => $months,
-        //     'totalDonasiAdmin' => $totalDonasiAdmin,
-        //     'totalDonasiAdminFormatted' => $totalDonasiAdminFormatted,
-        //     'monthlyDonations' => $monthlyDonations,
-        //     'donationDataAdmin' => $donationDataAdmin,
-        //     'years' => $years,
-        // ]);
         return response()->json([
-            'totalDistribusi' => 22,
-            'totalArsip' => 1,
-            'totalDonatur' => 4,
+            'totalDistribusi' => $totalDistribusi,
+            'totalArsip' => $totalArsip,
+            'totalDonatur' => $totalDonatur,
             'totalProgram' => $totalProgram,
             'totalGuest' => $totalGuest,
             'totalDonasiFormatted' => $totalDonasiFormatted,
@@ -116,5 +101,20 @@ class DashboardController extends Controller
             'donationDataAdmin' => $donationDataAdmin,
             'years' => $years,
         ]);
+        // return response()->json([
+        //     'totalDistribusi' => 22,
+        //     'totalArsip' => 1,
+        //     'totalDonatur' => 4,
+        //     'totalProgram' => $totalProgram,
+        //     'totalGuest' => $totalGuest,
+        //     'totalDonasiFormatted' => $totalDonasiFormatted,
+        //     'donationData' => $donationData,
+        //     'months' => $months,
+        //     'totalDonasiAdmin' => $totalDonasiAdmin,
+        //     'totalDonasiAdminFormatted' => $totalDonasiAdminFormatted,
+        //     'monthlyDonations' => $monthlyDonations,
+        //     'donationDataAdmin' => $donationDataAdmin,
+        //     'years' => $years,
+        // ]);
     }
 }

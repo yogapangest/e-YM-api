@@ -55,7 +55,7 @@ class DataUserController extends Controller
             'email' => 'required|email|unique:users,email',
             'password' => 'required|min:6|confirmed',
         ]);
-    
+
         // Create the user with the validated data
         $user = User::create([
             'name' => $request->name,
@@ -65,13 +65,13 @@ class DataUserController extends Controller
             'email' => $request->email,
             'password' => Hash::make($request->password),
         ]);
-    
+
         // Assign the 'Guest' role to the newly created user
         $guestRole = Role::where('name', 'Guest')->first();
         if ($guestRole) {
             $user->assignRole($guestRole);
         }
-    
+
         // Redirect the user to the dashboard with a success message
         return redirect()->route('index.view.datauser')->with('toast_success', 'User Berhasil Ditambahkan');
     }
@@ -115,7 +115,7 @@ class DataUserController extends Controller
         $user->alamat = $request->alamat;
         $user->telephone = $request->telephone;
         $user->email = $request->email;
-        
+
         if ($request->filled('password')) {
             $user->password = Hash::make($request->password);
         }

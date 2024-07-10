@@ -22,26 +22,27 @@
                     <div class="col-12">
                         <div class="card">
                             <div class="card-header">
-                                <h4>Daftar Data Barang : {{ $distribusi->program->nama }} -
-                                    {{ \carbon\carbon::parse($distribusi->tanggal)->translatedFormat('d F Y') }}</h4>
 
-                                <div class="card-header-form ">
-
-                                    <div class="d-flex justify-content-end mb-3">
-                                        <a href="{{ route('cetak.pdf', $distribusi_id) }}"
-                                            class="btn btn-round btn-danger mb-6 mr-2">Cetak</a>
-                                        <a href="{{ route('index.create.distribusibarang', $distribusi_id) }}"
-                                            class="btn btn-round btn-primary">Tambah</a>
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h4 id="nama_program"></h4>
+                                        <h4 id="tanggal"></h4>
                                     </div>
-                                    <form>
-                                        <div class="input-group">
-                                            <input type="text" class="form-control" placeholder="Search">
-                                            <div class="input-group-btn">
-                                                <button class="btn btn-primary mb-6"><i class="fas fa-search"></i></button>
+                                    <div class="text-end">
+                                        <a href="#" class="btn btn-round btn-danger mr-2">Cetak</a>
+                                        <a id="tambah" href="#" class="btn btn-round btn-primary">Tambah</a>
+                                        <form class="mt-2 mb-0">
+                                            <div class="input-group">
+                                                <input type="text" class="form-control" placeholder="Search">
+                                                <div class="input-group-btn">
+                                                    <button class="btn btn-primary mb-6"><i
+                                                            class="fas fa-search"></i></button>
+                                                </div>
                                             </div>
-                                        </div>
-                                    </form>
+                                        </form>
+                                    </div>
                                 </div>
+
                             </div>
                             <div class="card-body p-0">
                                 <div class="table-responsive">
@@ -56,56 +57,8 @@
                                             <th class="text-center">Aksi</th>
                                         </tr>
 
-                                        <tbody>
-                                            @if ($distribusi_barang->count() > 0)
-                                                @foreach ($distribusi_barang as $data)
-                                                    <tr>
-                                                        <td class="align-middle">{{ $loop->iteration }}</td>
-                                                        <td class="align-middle">{{ $data->nama_barang }}</td>
-                                                        <td class="align-middle">{{ $data->volume }}</td>
-                                                        <td class="align-middle">{{ $data->satuan }}</td>
-                                                        <td class="align-middle">
-                                                            {{ number_format($data->harga_satuan, 0, ',', '.') }}
-                                                        </td>
-                                                        <td class="align-middle">
-                                                            {{ number_format($data->jumlah, 0, ',', '.') }}
-                                                        </td>
-
-                                                        <td class="align-middle">
-                                                            <div class="d-flex justify-content-end">
-                                                                <a href="{{ route('index.edit.distribusibarang', $data->id) }}"
-                                                                    class="btn btn-primary ml-2">
-                                                                    <i class="fas fa-edit"></i>
-                                                                </a>
-                                                                {{-- <a href="{{ route('index.destroy.distribusibarang', $data->id) }}"
-                                                                    class="btn btn-danger ml-2">
-                                                                    <i class="fas fa-trash-alt"></i>
-                                                                </a> --}}
-
-                                                                <a href="#" class="btn btn-danger ml-2"
-                                                                    onclick="confirmDelete({{ $data->id }})">
-                                                                    <i class="fas fa-trash-alt"></i>
-                                                                </a>
-
-                                                                <form id="delete-form-{{ $data->id }}"
-                                                                    action="{{ route('index.destroy.distribusibarang', $data->id) }}"
-                                                                    method="POST" style="display: none;">
-                                                                    @csrf
-                                                                    @method('DELETE')
-                                                                </form>
-                                                            </div>
-                                                        </td>
-                                                    </tr>
-                                                @endforeach
-                                            @else
-                                                <tr>
-                                                    <td class="text-center" colspan="7">Data Barang Belum Diisi</td>
-                                                </tr>
-                                            @endif
-                                            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
-                                            <script src="{{ asset('js/hapus.js') }}"></script>
-
-                                            @include('sweetalert::alert')
+                                        <tbody id="table-distribusi-barangs">
+                                            {{-- data distribusi barang --}}
                                         </tbody>
 
                                     </table>
@@ -118,6 +71,119 @@
             </div>
         </section>
     </div>
+    <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4="
+        crossorigin="anonymous"></script>
+    <script>
+        $(document).ready(function() {
+
+
+            var distribusiId = window.location.pathname.split('/').pop();
+
+            $('#tambah').on('click', function() {
+                var url = '/apps/distribusi_barang/create/' + distribusiId;
+                window.location.href = url;
+
+            });
+            $.ajax({
+                url: '/api/admin/manajemen/distribusi-barang/' + distribusiId,
+                method: 'GET',
+                success: function(data) {
+
+                    var date = new Date(data.distribusi.tanggal);
+                    var formattedDate = formatTanggal(date);
+
+                    $('#nama_program').text('Daftar Data Barang : ' + data.program.nama_program);
+                    $('#tanggal').text('Tanggal : ' + formattedDate);
+
+                    if (Array.isArray(data.distribusibarangs)) {
+                        var tableBody = $('#table-distribusi-barangs');
+
+                        var index = 1;
+                        // Iterasi setiap kegiatan dalam data
+                        data.distribusibarangs.forEach(function(distribusibarangs) {
+                            // Buat baris tabel baru
+                            var row = $('<tr></tr>');
+
+                            // Tambahkan data kolom
+                            row.append('<td>' + index + '</td>');
+                            row.append('<td>' + distribusibarangs.nama_barang + '</td>');
+                            row.append('<td>' + distribusibarangs.volume + '</td>');
+                            row.append('<td>' + distribusibarangs.satuan + '</td>');
+                            row.append('<td>' + formatRupiah(distribusibarangs.harga_satuan) +
+                                '</td>');
+                            row.append('<td>' + formatRupiah(distribusibarangs.jumlah) +
+                                '</td>');
+
+
+                            row.append('<td><a href="' + '/apps/distribusi_barang/edit/' +
+                                distribusibarangs.id +
+                                '" class="mr-1 btn btn-primary">Edit</a><button data-id="' +
+                                distribusibarangs.id +
+                                '" class="btn btn-danger delete-button">Delete</button></td>'
+                            );
+
+
+                            // Tambahkan baris ke dalam tabel
+                            tableBody.append(row);
+
+                            index++;
+
+                        });
+
+                        $('.delete-button').on('click', function() {
+                            var id_distribusibarangs = $(this).data('id');
+                            console.log(id_distribusibarangs);
+                            deletedistribusibarang(id_distribusibarangs, $(this).closest('tr'));
+
+                        });
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('There has been a problem with your AJAX operation:', error);
+                }
+            });
+
+            function formatTanggal(date) {
+                var bulan = [
+                    "Januari", "Februari", "Maret", "April", "Mei", "Juni",
+                    "Juli", "Agustus", "September", "Oktober", "November", "Desember"
+                ];
+                var tanggal = date.getDate();
+                var bulanNama = bulan[date.getMonth()];
+                var tahun = date.getFullYear();
+                return tanggal + ' ' + bulanNama + ' ' + tahun;
+            }
+
+            function formatRupiah(number) {
+                return 'Rp ' + number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+            }
+
+            function deletedistribusibarang(id_distribusibarangs, row) {
+                if (confirm('Apa Anda yakin ingin menghapus kegiatan ini?')) {
+                    $.ajax({
+                        url: '/api/admin/manajemen/distribusi-barang/delete/' + id_distribusibarangs,
+                        method: 'DELETE',
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        },
+                        success: function(response) {
+                            if (response.status === 'success') {
+                                alert('Distribusi barang deleted successfully');
+                                // Remove the kegiatan row from the table
+                                row.remove();
+
+                            } else {
+                                alert('Failed to delete distribusi barang');
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            console.error('There has been a problem with your AJAX operation:', error);
+                        }
+                    });
+                }
+            }
+        });
+    </script>
 @endsection
 
 @section('script')

@@ -37,7 +37,7 @@ Route::post('logout', [AuthController::class, 'logout'])->middleware('auth:sanct
 
 Route::get('/dashboard', [DashboardController::class, 'index']);
 
-Route::prefix('admin/')->group( function (){
+Route::prefix('admin/')->middleware('auth:sanctum')->group( function (){
     //manajemen program
     Route::get('manajemen/program', [ProgramController::class, 'index']);
     Route::post('manajemen/program', [ProgramController::class, 'store']);
@@ -67,7 +67,7 @@ Route::prefix('admin/')->middleware('auth:sanctum')->group( function (){
 });
 
 
-Route::prefix('admin/')->group( function (){
+Route::prefix('admin/')->middleware('auth:sanctum')->group( function (){
     //manajemen Jenis Arsip
     Route::get('manajemen/jenis-arsip', [JenisArsipController::class, 'index']);
     Route::post('manajemen/jenis-arsip', [JenisArsipController::class, 'store']);

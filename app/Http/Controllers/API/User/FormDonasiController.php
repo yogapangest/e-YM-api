@@ -109,7 +109,7 @@ class FormDonasiController extends Controller
                 }
 
                 $files = $request->file('file');
-                $FileName = uniqid('donasi_') . '.' . $file->getClientOriginalExtension();
+                $FileName = uniqid('donasi_') . '.' . $files->getClientOriginalExtension();
                 $files->move(public_path('file/donasi'), $FileName);
                 $validatedData['file'] = $FileName;
             }
@@ -142,7 +142,7 @@ class FormDonasiController extends Controller
 
             $donasis->delete();
             $url = '/admin/donasi';
-            
+
             return response()->json([
                 'status' => 'seccess',
                 'message' => 'donasi has been removed',

@@ -111,6 +111,8 @@ class ArsipController extends Controller
                 $FileName = uniqid('arsip_') . '.' . $file->getClientOriginalExtension();
                 $files->move(public_path('file/arsip'), $FileName);
                 $validatedData['file'] = $FileName;
+            } else {
+                $validatedData['file'] = $donasis->file;
             }
             $arsips->update($validatedData);
             $url = '/admin/arsip';

@@ -6,17 +6,18 @@ use App\Http\Controllers\API\Auth\AuthController;
 use App\Http\Controllers\API\Admin\ArsipController;
 use App\Http\Controllers\API\Admin\ProgramController;
 use App\Http\Controllers\API\Admin\CetakPdfController;
+use App\Http\Controllers\API\Admin\DashboardController;
 use App\Http\Controllers\API\User\FormDonasiController;
 use App\Http\Controllers\API\Admin\DataBarangController;
 use App\Http\Controllers\API\Admin\DataDonasiController;
 use App\Http\Controllers\API\Admin\DistribusiController;
 use App\Http\Controllers\API\Admin\JenisArsipController;
 use App\Http\Controllers\API\Admin\RekapDonasiController;
+use App\Http\Controllers\API\Home\LeandingPageController;
 use App\Http\Controllers\Api\User\UpdateProfileController;
 use App\Http\Controllers\API\Admin\KontenProgramController;
 use App\Http\Controllers\API\Admin\DistribusiBarangController;
 use App\Http\Controllers\API\Admin\KontenPenyaluranController;
-use App\Http\Controllers\API\Admin\DashboardController;
 
 
 /*
@@ -30,14 +31,16 @@ use App\Http\Controllers\API\Admin\DashboardController;
 |
 */
 
+Route::get('leandingpage', [LeandingPageController::class, 'Leandingpage']);
 Route::post('register', [AuthController::class, 'Register']);
 Route::post('login', [AuthController::class, 'login']);
 
 Route::post('logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
 
-Route::get('/dashboard', [DashboardController::class, 'index']);
 
 Route::prefix('admin/')->group( function (){
+
+    Route::get('dashboard', [DashboardController::class, 'index']);
     //manajemen program
     Route::get('manajemen/program', [ProgramController::class, 'index']);
     Route::post('manajemen/program', [ProgramController::class, 'store']);
@@ -125,7 +128,7 @@ Route::prefix('admin/')->group( function (){
 //Controller User
 Route::prefix('user/')->middleware('auth:sanctum')->group( function (){
     //manajemen data donasi
-    Route::get('manajemen/formdonasi', [FormDonasiController::class, 'index']);
+    Route::get('manajemen/formdonasi/{id_user}', [FormDonasiController::class, 'index']);
     Route::post('manajemen/formdonasi', [FormdonasiController::class, 'store']);
     Route::get('manajemen/formdonasi/edit/{id}', [FormdonasiController::class, 'edit']);
     Route::put('manajemen/formdonasi/update/{id}', [FormDonasiController::class, 'update']);

@@ -63,6 +63,8 @@ class DistribusiController extends Controller
                     $files->move(public_path('file/distribusi'), $fileName);
                     $validatedData['file'] = $fileName;
                 }
+            } else {
+                $validatedData['file'] = $donasis->file;
             }
             
             $distribusis = Distribusi::create($validatedData);

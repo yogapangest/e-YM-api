@@ -37,10 +37,10 @@ Route::post('login', [AuthController::class, 'login']);
 
 Route::post('logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
 
+    Route::get('dashboard', [DashboardController::class, 'index']);
 
 Route::prefix('admin/')->middleware('auth:sanctum')->group( function (){
 
-    Route::get('dashboard', [DashboardController::class, 'index']);
     //manajemen program
     Route::get('manajemen/program', [ProgramController::class, 'index']);
     Route::post('manajemen/program', [ProgramController::class, 'store']);

@@ -19,6 +19,7 @@
                 <div class="row pt-2">
                     <div class="col-12">
                         <div class="card">
+                            <input type="hidden" name="user" id="user" value="{{ Auth::user()->id }}">
                             <div class="card-header">
                                 <h4>Daftar Donasi</h4>
                                 <div class="card-header-form">
@@ -44,43 +45,8 @@
                                             <th class="text-center">Aksi</th>
 
                                         </tr>
-                                        <tbody>
-                                            @if ($Donasi->count() > 0)
-                                                @foreach ($Donasi as $data)
-                                                    <tr>
-                                                        <td class="align-middle">{{ $loop->iteration }}</td>
-                                                        <td class="align-middle">{{ $data->created_at }}</td>
-                                                        <td class="align-middle">{{ $data->deskripsi }}</td>
-                                                        <td class="align-middle"> Rp.
-                                                            {{ number_format($data->nominal, 0, ',', '.') }}</td>
-                                                        <td class="align-middle">
-                                                            @if ($data->file)
-                                                                <a href="{{ asset('storage/donasis/' . $data->file) }}">
-                                                                    <i class="fas fa-file-alt"
-                                                                        style="font-size:
-                                                                20px;"></i>
-                                                                </a>
-                                                            @else
-                                                                <i>No file uploaded.</i>
-                                                            @endif
-                                                        </td>
-                                                        <td class="align-middle">
-                                                            <div class="d-flex justify-content-center">
-                                                                <!-- Menggunakan flexbox untuk membuat ikon sejajar -->
-                                                                <a href="{{ route('form.edit.donasi', $data->id) }}"
-                                                                    class="btn btn-primary ml-2">
-                                                                    <!-- Gunakan class ml-2 untuk margin kiri -->
-                                                                    <i class="fas fa-edit"></i>
-                                                                </a>
-                                                            </div>
-                                                        </td>
-                                                    </tr>
-                                                @endforeach
-                                            @else
-                                                <tr>
-                                                    <td class="text-center" colspan="5">Daftar Donasi Belum Ada</td>
-                                                </tr>
-                                            @endif
+                                        <tbody id="table-rekap-donasi">
+                                            {{-- data rekap donasi user --}}
                                         </tbody>
                                     </table>
                                 </div>
@@ -92,6 +58,127 @@
             </div>
         </section>
     </div>
+    <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4="
+        crossorigin="anonymous"></script>
+    <script>
+        $(document).ready(function() {
+            var userId = $('#user').val();
+            $.ajax({
+                url: '/api/user/manajemen/formdonasi/' + userId,
+                method: 'GET',
+                success: function(data) {
+                    if (Array.isArray(data.donasi)) {
+                        var tableBody = $('#table-rekap-donasi');
+
+                        var index = 1;
+                        // Iterasi setiap kegiatan dalam data
+                        data.donasi.forEach(function(donasi) {
+                            // Misalkan `donasi` adalah objek yang berisi data donasi
+                            var date = new Date(donasi.created_at);
+                            var formattedDate = formatTanggal(date);
+                            // Buat baris tabel baru
+                            var row = $('<tr></tr>');
+
+                            // Tambahkan data kolom
+                            row.append('<td>' + index + '</td>');
+                            row.append('<td>' + formattedDate + '</td>');
+                            row.append('<td>' + donasi.deskripsi + '</td>');
+                            row.append('<td>' + donasi.nominal + '</td>');
+
+
+                            var fileUrl = donasi.file; // URL file
+
+                            if (!fileUrl) {
+                                fileUrl = null
+                                row.append('<td>' + null + '</td>');
+
+                            } else {
+                                // Tentukan tipe file berdasarkan ekstensi
+                                var fileExtension = fileUrl.split('.').pop().toLowerCase();
+
+                                if (['jpg', 'jpeg', 'png', 'gif'].includes(fileExtension)) {
+                                    // Jika file gambar, buat elemen img
+                                    row.append('<td><img src="' + '/file/donasi/' + fileUrl +
+                                        '" alt="' + program.file +
+                                        '" style="width: 70px; height: auto; border-radius: 0;"></td>'
+                                    );
+                                } else if (fileExtension === 'pdf') {
+                                    // Jika file PDF, buat link untuk mengunduh
+                                    row.append('<td><a href="' + '/file/donasi/' + fileUrl +
+                                        '" class="btn btn-primary"><i class="fas fa-file"></i></a></td>'
+                                    );
+                                }
+                            }
+
+                            row.append('<td><a href="' + '/apps/donasi/' + donasi.id +
+                                '/edit' +
+                                '" class="mr-1 btn btn-primary">Edit</a><button data-id="' +
+                                donasi.id +
+                                '" class="btn btn-danger delete-button">Delete</button></td>'
+                            );
+
+
+                            // Tambahkan baris ke dalam tabel
+                            tableBody.append(row);
+
+                            index++;
+
+                        });
+
+                        $('.delete-button').on('click', function() {
+                            var id_donasi = $(this).data('id');
+                            console.log(id_donasi);
+                            deleteProgram(id_donasi, $(this).closest('tr'));
+
+                        });
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('There has been a problem with your AJAX operation:', error);
+                }
+            });
+
+            // Fungsi untuk format tanggal dan waktu
+            function formatTanggal(date) {
+                var bulan = [
+                    "Januari", "Februari", "Maret", "April", "Mei", "Juni",
+                    "Juli", "Agustus", "September", "Oktober", "November", "Desember"
+                ];
+                var tanggal = date.getDate();
+                var bulanNama = bulan[date.getMonth()];
+                var tahun = date.getFullYear();
+                var jam = date.getHours().toString().padStart(2, '0');
+                var menit = date.getMinutes().toString().padStart(2, '0');
+                var detik = date.getSeconds().toString().padStart(2, '0');
+                return tanggal + ' ' + bulanNama + ' ' + tahun + ' ' + jam + ':' + menit + ':' + detik;
+            }
+
+            function deleteProgram(id_donasi, row) {
+                if (confirm('Apa Anda yakin ingin menghapus kegiatan ini?')) {
+                    $.ajax({
+                        url: '/api/admin/manajemen/formdonasi/delete/' + id_donasi,
+                        method: 'DELETE',
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        },
+                        success: function(response) {
+                            if (response.status === 'success') {
+                                alert('kegiatan deleted successfully');
+                                // Remove the kegiatan row from the table
+                                row.remove();
+
+                            } else {
+                                alert('Failed to delete kegiatan');
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            console.error('There has been a problem with your AJAX operation:', error);
+                        }
+                    });
+                }
+            }
+        });
+    </script>
 @endsection
 
 @section('script')

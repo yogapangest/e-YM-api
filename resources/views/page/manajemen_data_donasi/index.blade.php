@@ -47,47 +47,8 @@
                                             <th class="text-center">Rekap</th>
                                             <th class="text-center">Aksi</th>
                                         </tr>
-                                        <tbody>
-                                            @if ($dataDonasi->count() > 0)
-                                                @foreach ($dataDonasi as $data)
-                                                    <tr>
-                                                        <td class="align-middle">{{ $loop->iteration }}</td>
-                                                        <td class="align-middle">{{ $data->nama }}</td>
-                                                        <td class="align-middle">{{ $data->alamat }}</td>
-                                                        <td class="align-middle">{{ $data->telephone }}</td>
-                                                        <td class="align-middle">{{ $data->email }}</td>
-                                                        <td class="align-middle">
-                                                            <div class="text-center">
-                                                                <!-- Menggunakan flexbox untuk membuat ikon sejajar -->
-                                                                <a href="{{ route('index.view.bukti', $data->id) }}"
-                                                                    class="btn btn-primary ml-2">
-                                                                    <!-- Gunakan class ml-2 untuk margin kiri -->
-                                                                    <i class="fas fa-database"></i>
-                                                                </a>
-                                                            </div>
-                                                        </td>
-                                                        <td class="align-middle">
-                                                            <div class="d-flex justify-content-center">
-                                                                <!-- Menggunakan flexbox untuk membuat ikon sejajar -->
-                                                                <a href="{{ route('index.edit.datadonasi', $data->id) }}"
-                                                                    class="btn btn-primary ml-2">
-                                                                    <!-- Gunakan class ml-2 untuk margin kiri -->
-                                                                    <i class="fas fa-edit"></i>
-                                                                </a>
-                                                                <a href="{{ route('index.destroy.datadonasi', $data->id) }}"
-                                                                    class="btn btn-danger ml-2">
-                                                                    <!-- Gunakan class ml-2 untuk margin kiri -->
-                                                                    <i class="fas fa-trash-alt"></i>
-                                                                </a>
-                                                            </div>
-                                                        </td>
-                                                    </tr>
-                                                @endforeach
-                                            @else
-                                                <tr>
-                                                    <td class="text-center" colspan="7">Data Donasi Belum Diisi</td>
-                                                </tr>
-                                            @endif
+                                        <tbody id="table-data-donasi">
+                                            {{-- data donasi --}}
                                         </tbody>
                                     </table>
                                 </div>
@@ -99,6 +60,90 @@
             </div>
         </section>
     </div>
+    <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4="
+        crossorigin="anonymous"></script>
+    <script>
+        $(document).ready(function() {
+            $.ajax({
+                url: '/api/admin/manajemen/data-donasi',
+                method: 'GET',
+                success: function(data) {
+                    if (Array.isArray(data.user)) {
+                        var tableBody = $('#table-data-donasi');
+
+                        var index = 1;
+                        // Iterasi setiap kegiatan dalam data
+                        data.user.forEach(function(user) {
+                            // Buat baris tabel baru
+                            var row = $('<tr></tr>');
+
+                            // Tambahkan data kolom
+                            row.append('<td>' + index + '</td>');
+                            row.append('<td>' + user.name + '</td>');
+                            row.append('<td>' + user.alamat + '</td>');
+                            row.append('<td>' + user.telephone + '</td>');
+                            row.append('<td>' + user.email + '</td>');
+
+                            row.append('<td><a href="' + '/apps/donasi/view/' +
+                                user
+                                .id +
+                                '" class="btn btn-primary"><i class="fas fa-clipboard-list"></i></a></td>'
+                            );
+
+                            row.append('<td><a href="' + '/apps/data_donasi/' + user.id +
+                                '/edit' +
+                                '" class="mr-1 btn btn-primary">Edit</a><button data-id="' +
+                                user.id +
+                                '" class="btn btn-danger delete-button">Delete</button></td>'
+                            );
+
+
+                            // Tambahkan baris ke dalam tabel
+                            tableBody.append(row);
+
+                            index++;
+
+                        });
+
+                        $('.delete-button').on('click', function() {
+                            var id_data_donasi = $(this).data('id');
+                            console.log(id_data_donasi);
+                            deleteDataDonasi(id_data_donasi, $(this).closest('tr'));
+
+                        });
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('There has been a problem with your AJAX operation:', error);
+                }
+            });
+
+            function deleteDataDonasi(id_data_donasi, row) {
+                if (confirm('Apa Anda yakin ingin menghapus Data User ini?')) {
+                    $.ajax({
+                        url: '/api/admin/manajemen/data-donasi/delete/' + id_data_donasi,
+                        method: 'DELETE',
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        },
+                        success: function(response) {
+                            if (response.status === 'success') {
+                                alert('Data Donasi deleted successfully');
+                                // Remove the kegiatan row from the table
+                                row.remove();
+
+                            } else {
+                                alert('Failed to delete Data Donasi');
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            console.error('There has been a problem with your AJAX operation:', error);
+                        }
+                    });
+                }
+            }
+        });
+    </script>
 @endsection
 
 @section('script')

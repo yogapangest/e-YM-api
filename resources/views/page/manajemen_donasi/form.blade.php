@@ -12,7 +12,7 @@
                             <h4>Tambah Donasi</h4>
                         </div>
                         <div class="card-body">
-                            <form method="POST" action="{{ route('form.store.donasi') }}" enctype="multipart/form-data">
+                            <form id="donasiForm" method="POST" enctype="multipart/form-data">
                                 @csrf
                                 <div class="form-group">
                                     <label for="deskripsi">Deskripsi</label>
@@ -70,4 +70,42 @@
             </div>
         </section>
     </div>
+    <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4="
+        crossorigin="anonymous"></script>
+    </script>
+    <script>
+        $(document).ready(function() {
+
+            $('#donasiForm').submit(function(event) {
+                event.preventDefault();
+
+                var formData = new FormData();
+                formData.append('deskripsi', $('#deskripsi').val());
+                formData.append('nominal', $('#nominal').val());
+
+                if ($('#file')[0].files[0]) {
+                    formData.append('file', $('#file')[0].files[0]);
+                }
+
+                $.ajax({
+                    url: '/api/user/manajemen/formdonasi',
+                    method: 'POST',
+                    contentType: 'application/json',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    success: function(data) {
+                        window.location.href = '/apps/donasi/user/view';
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('There has been a problem with your AJAX operation:',
+                            error);
+                    }
+                });
+            });
+        });
+    </script>
 @endsection

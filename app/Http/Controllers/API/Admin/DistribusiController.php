@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\File;
+use Illuminate\Validation\ValidationException;
 
 class DistribusiController extends Controller
 {
@@ -63,8 +64,6 @@ class DistribusiController extends Controller
                     $files->move(public_path('file/distribusi'), $fileName);
                     $validatedData['file'] = $fileName;
                 }
-            } else {
-                $validatedData['file'] = $donasis->file;
             }
 
             $distribusis = Distribusi::create($validatedData);
@@ -76,7 +75,7 @@ class DistribusiController extends Controller
                 'distribusi' => $distribusis,
                 'url' => $url,
             ], 200);
-        } catch (Exception $e) {
+        } catch (ValidationException $e) {
             Log::error('Validation error: ' . $e->getMessage());
 
             return response()->json([

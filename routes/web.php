@@ -114,7 +114,9 @@ Route::prefix('apps')->middleware(['auth:sanctum', 'CheckRole:Admin;User'])->gro
     })->name('index.edit.arsip');
 
     //form data donasi(admin)
-    Route::get('/donasi/{user_id}', [AdminDonasiController::class, 'show'])->name('form.show.donasi_admin');
+    Route::get('/donasi/view/{user_id}', function(){
+        return view('page.manajemen_donasi.show');
+    })->name('form.show.donasi_admin');
     Route::get('/donasi/{user_id}/create', [AdminDonasiController::class, 'createform'])->name('form.create.donasi_admin');
     Route::post('/donasi/{user_id}/store', [AdminDonasiController::class, 'storeform'])->name('form.store.donasi_admin');
     Route::get('/donasi/form/{id}/editform',[AdminDonasiController::class, 'editform'])->name('form.edit.donasi_admin');
@@ -122,8 +124,12 @@ Route::prefix('apps')->middleware(['auth:sanctum', 'CheckRole:Admin;User'])->gro
     Route::delete('/donasi/form/{id}/destroy',[AdminDonasiController::class, 'destroy'])->name('form.destroy.donasi_admin');
 
     //form data donasi(guest)
-    Route::get('/donasi/user/view', [DonasiController::class, 'index'])->name('form.index.donasi');
-    Route::get('/donasi/user/form/create', [DonasiController::class, 'create'])->name('form.create.donasi');
+    Route::get('/donasi/user/view', function(){
+        return view('page.manajemen_donasi.index');
+    })->name('form.index.donasi');
+    Route::get('/donasi/user/form/create', function(){
+        return view('page.manajemen_donasi.form');
+    })->name('form.create.donasi');
     Route::post('/donasi/user/form/store', [DonasiController::class, 'store'])->name('form.store.donasi');
     Route::get('/donasi/form/{id}/edit', [DonasiController::class, 'edit'])->name('form.edit.donasi');
     Route::put('/donasi/form/{id}/update', [DonasiController::class, 'update'])->name('form.update.donasi');
@@ -133,11 +139,19 @@ Route::prefix('apps')->middleware(['auth:sanctum', 'CheckRole:Admin;User'])->gro
     Route::get('/data_donasi/view',function(){
         return view('page.manajemen_data_donasi.index');
     })->name('index.view.datadonasi');
-    Route::get('/data_donasi/create',[DataDonasiController::class, 'create'])->name('index.create.datadonasi');
-    Route::post('/data_donasi/store',[DataDonasiController::class, 'store'])->name('index.store.datadonasi');
-    Route::get('/data_donasi/{id}/edit',[DataDonasiController::class, 'edit'])->name('index.edit.datadonasi');
-    Route::put('/data_donasi/{id}/update',[DataDonasiController::class, 'update'])->name('index.update.datadonasi');
-    Route::get('/data_donasi/{id_donasi}/destroy',[DataDonasiController::class, 'destroy'])->name('index.destroy.datadonasi');
+    Route::get('/data_donasi/create',function(){
+        return view('page.manajemen_data_donasi.create');
+    })->name('index.create.datadonasi');
+    Route::get('/data_donasi/{id}/edit',function(){
+        return view('page.manajemen_data_donasi.edit');
+    })->name('index.edit.datadonasi');
+
+    //rekap donasi
+    Route::get('/rekap_donasi/view',function(){
+        return view('page.manajemen_rekap_donasi.index');
+    })->name('index.view.rekapdonasi');
+
+
 
     //manajemen data_user
     Route::get('/data_user/view',[DataUserController::class, 'index'])->name('index.view.datauser');

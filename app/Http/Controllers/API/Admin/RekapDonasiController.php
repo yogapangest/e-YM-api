@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Models\BuktiDonasi;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\File;
 
 class RekapDonasiController extends Controller
 {
@@ -18,6 +19,8 @@ class RekapDonasiController extends Controller
 
             // Ambil data donasi berdasarkan users_id
             $donasis = BuktiDonasi::where('users_id', $id)->get();
+
+            // dd($donasis);
             $url = '/admin/donasi';
 
             return response()->json([
@@ -34,19 +37,19 @@ class RekapDonasiController extends Controller
             ], 500);
         }
     }
-    
+
     public function store(Request $request)
     {
         try {
             $validatedData = $request->validate([
-                'tanggal' => 'required|string|max:255',
                 'nominal' => 'required|string|max:255',
                 'deskripsi' => 'required|string',
-                'file' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,pdf,doc,docx,jpg,png|max:2048',
+                'file' => 'nullable|mimes:jpeg,png,jpg,gif,svg,pdf,doc,docx,jpg,png|max:2048',
                 // 'users_id' => 'required|integer|exists:users,id',
             ]);
 
             // Gunakan ID pengguna yang terotentikasi
+            dd($request->user()->id);
             $validatedData['users_id'] = $request->user()->id;
 
             if ($request->hasFile('file')) {
@@ -105,10 +108,9 @@ class RekapDonasiController extends Controller
             $donasi = BuktiDonasi::findOrFail($id);
 
             $validatedData = $request->validate([
-                'tanggal' => 'required|string|max:255',
                 'nominal' => 'required|string|max:255',
                 'deskripsi' => 'required|string',
-                'file' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,pdf,doc,docx,jpg,png|max:2048',
+                'file' => 'nullable|mimes:jpeg,png,jpg,gif,svg,pdf,doc,docx,jpg,png|max:2048',
             ]);
 
             if ($request->hasFile('file')) {
@@ -121,7 +123,7 @@ class RekapDonasiController extends Controller
                 $file->move(public_path('file/donasi'), $fileName);
                 $validatedData['file'] = $fileName;
             } else {
-                $validatedData['file'] = $donasis->file;
+                $validatedData['file'] = $donasi->file;
             }
 
             $donasi->update($validatedData);
@@ -154,7 +156,7 @@ class RekapDonasiController extends Controller
 
             $donasi->delete();
             $url = '/admin/donasi';
-            
+
             return response()->json([
                 'status' => 'success',
                 'message' => 'Donasi has been removed',

@@ -123,9 +123,8 @@ class ProgramController extends Controller
                 $FileName = uniqid('program_') . '.' . $files->getClientOriginalExtension();
                 $files->move(public_path('file/program'), $FileName);
                 $validatedData['file'] = $FileName;
-            } else {
-                $validatedData['file'] = $donasis->file;
             }
+
             $programs->update($validatedData);
             $url = '/apps/program/view';
 

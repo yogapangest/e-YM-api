@@ -57,9 +57,6 @@ class AuthController extends Controller
             'role' => 'User',
         ]);
 
-        // $user->role = 'User';
-        // $user->save();
-
         $token = $user->createToken('User')->plainTextToken;
         
         $cookieName = 'access_token';

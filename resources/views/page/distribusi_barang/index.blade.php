@@ -29,7 +29,7 @@
                                         <h4 id="tanggal"></h4>
                                     </div>
                                     <div class="text-end">
-                                        <a href="#" class="btn btn-round btn-danger mr-2">Cetak</a>
+                                        <a id="cetak" href="#" class="btn btn-round btn-danger mr-2">Cetak</a>
                                         <a id="tambah" href="#" class="btn btn-round btn-primary">Tambah</a>
                                         <form class="mt-2 mb-0">
                                             <div class="input-group">
@@ -82,8 +82,12 @@
             $('#tambah').on('click', function() {
                 var url = '/apps/distribusi_barang/create/' + distribusiId;
                 window.location.href = url;
-
             });
+            $('#cetak').on('click', function() {
+                var url = '/apps/cetak/' + distribusiId;
+                window.location.href = url;
+            });
+
             $.ajax({
                 url: '/api/admin/manajemen/distribusi-barang/' + distribusiId,
                 method: 'GET',
@@ -115,11 +119,12 @@
                                 '</td>');
 
 
-                            row.append('<td><a href="' + '/apps/distribusi_barang/edit/' +
+                            row.append('<td class="d-flex align-items-center"><a href="' +
+                                '/apps/distribusi_barang/edit/' +
                                 distribusibarangs.id +
-                                '" class="mr-1 btn btn-primary">Edit</a><button data-id="' +
+                                '" class="mr-1 btn btn-primary"><i class="fas fa-edit"></i></a><button data-id="' +
                                 distribusibarangs.id +
-                                '" class="btn btn-danger delete-button">Delete</button></td>'
+                                '" class="btn btn-danger delete-button"><i class="fas fa-trash-alt"></i></button></td>'
                             );
 
 

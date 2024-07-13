@@ -117,23 +117,21 @@
             $('#RegisterForm').submit(function(event) {
                 event.preventDefault();
                 var email = $('#email').val();
-                var email = $('#name').val();
-                var email = $('#username').val();
-                var email = $('#alamat').val();
-                var email = $('#telephone').val();
+                var name = $('#name').val();
+                var username = $('#username').val();
+                var alamat = $('#alamat').val();
+                var telephone = $('#telephone').val();
                 var password = $('#password').val();
-                var password = $('#confirm_password').val();
+                var confirm_password = $('#confirm_password').val();
 
-                var requestData = {
-                    email: email,
-                    password: password
-                };
+                var formData = new FormData(this);
 
                 $.ajax({
                     url: '/api/register',
                     method: 'POST',
-                    contentType: 'application/json',
-                    data: JSON.stringify(requestData),
+                    data: formData,
+                    processData: false,
+                    contentType: false,
                     headers: {
                         'X-CSRF-TOKEN': '{{ csrf_token() }}'
                     },

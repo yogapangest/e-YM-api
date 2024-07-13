@@ -85,13 +85,15 @@
                                 '" style="width: 70px; height: auto; border-radius: 0;"></td>'
                             );
 
-                            row.append('<td><a href="' + '/apps/konten_program/' +
+                            row.append(
+                                '<td style="display: flex; justify-content: center; align-items: center;"><a href="' +
+                                '/apps/konten_program/' +
                                 konten_program
                                 .id +
                                 '/edit' +
-                                '" class="mr-1 btn btn-primary">Edit</a><button data-id="' +
+                                '" class="mr-1 btn btn-primary"><i class="fas fa-edit"></i></a><button data-id="' +
                                 konten_program.id +
-                                '" class="btn btn-danger delete-button">Delete</button></td>'
+                                '" class="btn btn-danger delete-button"><i class="fas fa-trash-alt"></i></button></td>'
                             );
 
 

@@ -19,11 +19,11 @@
                     <div class="col-12">
                         <div class="card">
                             <div class="card-header">
-                                <h4>Daftar Donasi {{ $user->name }}</h4>
+                                <h4>Daftar Donasi</h4>
                                 <div class="card-header-form">
                                     <div class="ml-auto mb-2">
-                                        <a href="{{ route('form.create.donasi_admin', ['user_id' => $user->id]) }}"
-                                            style="float: right;" class="btn btn-round btn-primary mb-3">Tambah</a>
+                                        <a id="tambah" href="#" style="float: right;"
+                                            class="btn btn-round btn-primary mb-3">Tambah</a>
                                     </div>
                                     <form>
                                         <div class="input-group">
@@ -46,61 +46,8 @@
                                             <th>File</th>
                                             <th class="text-center">Aksi</th>
                                         </tr>
-                                        <tbody>
-                                            @if ($donasi->count() > 0)
-                                                @foreach ($donasi as $data)
-                                                    <tr>
-                                                        <td class="align-middle">{{ $loop->iteration }}</td>
-                                                        <td class="align-middle">{{ $data->created_at }}</td>
-                                                        <td class="align-middle">{{ $data->deskripsi }}</td>
-                                                        <td class="align-middle">
-                                                            Rp. {{ number_format(floatval($data->nominal), 0, ',', '.') }}
-                                                        </td>
-                                                        <td class="align-middle">
-                                                            @if ($data->file)
-                                                                <a href="{{ asset('storage/donasis/' . $data->file) }}">
-                                                                    <i class="fas fa-file-alt" style="font-size: 20px;"></i>
-                                                                </a>
-                                                            @else
-                                                                <i>No file uploaded.</i>
-                                                            @endif
-                                                        </td>
-                                                        <td class="align-middle">
-                                                            <div class="d-flex justify-content-end">
-                                                                <a href="{{ route('form.edit.donasi_admin', $data->id) }}"
-                                                                    class="btn btn-primary ml-2">
-                                                                    <i class="fas fa-edit"></i>
-                                                                </a>
-                                                                {{-- <a href="{{ route('form.destroy.donasi_admin', $data->id) }}"
-                                                                    class="btn btn-danger ml-2">
-                                                                    <i class="fas fa-trash-alt"></i>
-                                                                </a> --}}
-
-                                                                <a href="#" class="btn btn-danger ml-2"
-                                                                    onclick="confirmDelete({{ $data->id }})">
-                                                                    <i class="fas fa-trash-alt"></i>
-                                                                </a>
-
-                                                                <form id="delete-form-{{ $data->id }}"
-                                                                    action="{{ route('form.destroy.donasi_admin', $data->id) }}"
-                                                                    method="POST" style="display: none;">
-                                                                    @csrf
-                                                                    @method('DELETE')
-                                                                </form>
-
-                                                            </div>
-                                                        </td>
-                                                    </tr>
-                                                @endforeach
-                                            @else
-                                                <tr>
-                                                    <td class="text-center" colspan="6">Daftar Donasi Belum Ada</td>
-                                                </tr>
-                                            @endif
-                                            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
-                                            <script src="{{ asset('js/hapus.js') }}"></script>
-
-                                            @include('sweetalert::alert')
+                                        <tbody id="table-admin-rekap-donasi">
+                                            {{-- admin data rekap donasi --}}
                                         </tbody>
                                     </table>
                                 </div>
@@ -111,6 +58,150 @@
             </div>
         </section>
     </div>
+    <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4="
+        crossorigin="anonymous"></script>
+    <script>
+        $(document).ready(function() {
+
+            var userId = window.location.pathname.split('/').pop();
+
+            $('#tambah').on('click', function() {
+                var url = '/apps/donasi/' + userId + '/create/';
+                window.location.href = url;
+
+            });
+
+            // var userId = window.location.pathname.split('/').pop();
+            $.ajax({
+                url: '/api/admin/manajemen/rekap-donasi/' + userId,
+                method: 'GET',
+                success: function(data) {
+                    console.log(data)
+                    if (Array.isArray(data.donasi)) {
+                        var tableBody = $('#table-admin-rekap-donasi');
+
+                        var index = 1;
+                        // Iterasi setiap kegiatan dalam data
+                        data.donasi.forEach(function(donasi) {
+
+                            // Misalkan `donasi` adalah objek yang berisi data donasi
+                            var date = new Date(donasi.created_at);
+                            var formattedDate = formatTanggal(date);
+                            // Buat baris tabel baru
+                            var row = $('<tr></tr>');
+
+                            // Tambahkan data kolom
+                            row.append('<td>' + index + '</td>');
+                            row.append('<td>' + formattedDate + '</td>');
+                            row.append('<td>' + donasi.deskripsi + '</td>');
+                            row.append('<td>' + formatRupiah(donasi.nominal) + '</td>');
+
+
+                            var fileUrl = donasi.file; // URL file
+
+                            if (!fileUrl) {
+                                fileUrl = null
+                                row.append('<td>' + null + '</td>');
+
+                            } else {
+                                // Tentukan tipe file berdasarkan ekstensi
+                                var fileExtension = fileUrl.split('.').pop().toLowerCase();
+
+                                if (['jpg', 'jpeg', 'png', 'gif'].includes(fileExtension)) {
+                                    // Jika file gambar, buat elemen img
+                                    row.append('<td><img src="' + '/file/donasi/' + fileUrl +
+                                        '" alt="' + program.file +
+                                        '" style="width: 70px; height: auto; border-radius: 0;"></td>'
+                                    );
+                                } else if (fileExtension === 'pdf') {
+                                    // Jika file PDF, buat link untuk mengunduh
+                                    row.append('<td><a href="' + '/file/donasi/' + fileUrl +
+                                        '" class="btn btn-primary"><i class="fas fa-file"></i></a></td>'
+                                    );
+                                }
+                            }
+
+                            row.append(
+                                '<td style="display: flex; justify-content: center; align-items: center;"><a href="' +
+                                '/apps/donasi/form/' + donasi.id +
+                                '/editform' +
+                                '" class="mr-1 btn btn-primary"><i class="fas fa-edit"></i></a><button data-id="' +
+                                donasi.id +
+                                '" class="btn btn-danger delete-button"><i class="fas fa-trash-alt"></i></button></td>'
+                            );
+
+
+                            // Tambahkan baris ke dalam tabel
+                            tableBody.append(row);
+
+                            index++;
+
+                        });
+
+                        $('.delete-button').on('click', function() {
+                            var id_rekap_admin = $(this).data('id');
+                            console.log(id_rekap_admin);
+                            deleteRekapAdmin(id_rekap_admin, $(this).closest('tr'));
+
+                        });
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('There has been a problem with your AJAX operation:', error);
+                }
+            });
+
+            function formatRupiah(number) {
+                // Ubah number menjadi string dan tambahkan Rp di depannya
+                let formattedNumber = 'Rp ' + number.toString();
+
+                // Tambahkan titik sebagai pemisah ribuan
+                formattedNumber = formattedNumber.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+
+                return formattedNumber;
+            }
+
+            // Fungsi untuk format tanggal dan waktu
+            function formatTanggal(date) {
+                var bulan = [
+                    "Januari", "Februari", "Maret", "April", "Mei", "Juni",
+                    "Juli", "Agustus", "September", "Oktober", "November", "Desember"
+                ];
+                var tanggal = date.getDate();
+                var bulanNama = bulan[date.getMonth()];
+                var tahun = date.getFullYear();
+                var jam = date.getHours().toString().padStart(2, '0');
+                var menit = date.getMinutes().toString().padStart(2, '0');
+                var detik = date.getSeconds().toString().padStart(2, '0');
+                return tanggal + ' ' + bulanNama + ' ' + tahun + ' ' + jam + ':' + menit + ':' + detik;
+            }
+
+            function deleteRekapAdmin(id_rekap_admin, row) {
+                if (confirm('Apa Anda yakin ingin menghapus Rekap ini?')) {
+                    $.ajax({
+                        url: '/api/admin/manajemen/rekap-donasi/delete/' + id_rekap_admin,
+                        method: 'DELETE',
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        },
+                        success: function(response) {
+                            if (response.status === 'success') {
+                                alert('kegiatan deleted successfully');
+                                // Remove the kegiatan row from the table
+                                row.remove();
+
+                            } else {
+                                alert('Failed to delete kegiatan');
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            console.error('There has been a problem with your AJAX operation:', error);
+                        }
+                    });
+                }
+            }
+        });
+    </script>
 @endsection
 
 @section('script')

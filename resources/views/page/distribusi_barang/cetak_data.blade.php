@@ -96,6 +96,10 @@
 </head>
 
 <body>
+    <div style="text-align: center;">
+        <button id="cetak" href="#" class="btn btn-primary">Unduh
+            Laporan</button>
+    </div>
 
     <table style="width: 100%; text-align: center;">
         <tr>
@@ -105,35 +109,11 @@
                 </p>
             </td>
             <td style="width: 20%;">
-                <img style="float: right; width: 300px; height: auto; max-width: 100%;"
-                    src="{{ public_path('assets/img/e-ym/eym.png') }}" alt="Gambar" />
+                <img style="float: right; width: 300px; height: auto; max-width: 100%;" src="/assets/img/e-ym/eym.png"
+                    alt="Gambar" />
             </td>
         </tr>
     </table>
-
-    <div>
-        <table style="width: 100%; border-collapse: collapse;">
-            <tbody>
-                <?php $firstItem = true; ?> <!-- Inisialisasi variabel $firstItem -->
-                @foreach ($distribusi_barang as $barang)
-                    @if ($firstItem)
-                        <tr>
-                            <td colspan="1" style="padding: 5px;">
-                                Tanggal :
-                                {{ \carbon\carbon::parse($barang->distribusi->tanggal)->translatedFormat('d F Y') }}
-                            </td>
-                        </tr>
-                        <tr>
-                            <td style="width: 50%; padding: 5px;">
-                                Program : {{ $barang->distribusi->program->nama }}
-                            </td>
-                        </tr>
-                        <?php $firstItem = false; ?> <!-- Set $firstItem menjadi false agar tidak diproses lagi -->
-                    @endif
-                @endforeach
-            </tbody>
-        </table>
-    </div>
 
     <table border="1">
         <thead>
@@ -146,57 +126,19 @@
                 <th>Jumlah</th>
             </tr>
         </thead>
-        <tbody>
-            <?php $totalJumlah = 0; ?> <!-- Inisialisasi variabel totalJumlah -->
-            @foreach ($distribusi_barang as $barang)
-                <tr>
-                    <td class="text-center">{{ $loop->iteration }}</td>
-                    <td class="text-center">{{ $barang->nama_barang }}</td>
-                    <td class="text-center">{{ $barang->volume }}</td>
-                    <td class="text-center">{{ $barang->satuan }}</td>
-                    <td class="text-center">{{ number_format($barang->harga_satuan, 0, ',', '.') }}
-                    </td>
-                    <td class="text-center">{{ number_format($barang->jumlah, 0, ',', '.') }}</td>
-                </tr>
-                <?php $totalJumlah += $barang->jumlah; ?> <!-- Tambahkan nilai jumlah ke totalJumlah -->
-            @endforeach
+        <tbody id="data-barang">
+            <!-- Data barang akan diisi melalui JavaScript -->
         </tbody>
     </table>
 
     <br>
-    <div style="text-align: right;">Total Jumlah: {{ number_format($totalJumlah, 0, ',', '.') }}</div>
+    <div style="text-align: right;">Total Jumlah: <span id="total-jumlah"></span></div>
     <!-- Tampilkan total jumlah -->
 
     <div>
         <table style="width: 100%; border-collapse: collapse;">
-            <tbody>
-                <?php $firstItem = true; ?> <!-- Inisialisasi variabel $firstItem -->
-                @foreach ($distribusi_barang as $barang)
-                    @if ($firstItem)
-                        <tr>
-                            <td colspan="1" style="padding: 5px;">
-                                Anggaran
-                            </td>
-                        </tr>
-                        <tr>
-                            <td style="width: 50%; padding: 5px;">
-                                Dropingan : Rp. {{ number_format($barang->distribusi->anggaran, 0, ',', '.') }}
-                            </td>
-                        </tr>
-                        <tr>
-                            <td style="width: 50%; padding: 5px;">
-                                Total Pengeluaran : Rp.
-                                {{ number_format($barang->distribusi->pengeluaran, 0, ',', '.') }}
-                            </td>
-                        </tr>
-                        <tr>
-                            <td style="width: 50%; padding: 5px;">
-                                Sisa : Rp. {{ number_format($barang->distribusi->sisa, 0, ',', '.') }}
-                            </td>
-                        </tr>
-                        <?php $firstItem = false; ?> <!-- Set $firstItem menjadi false agar tidak diproses lagi -->
-                    @endif
-                @endforeach
+            <tbody id="data-anggaran">
+                <!-- Data anggaran akan diisi melalui JavaScript -->
             </tbody>
         </table>
     </div>
@@ -213,6 +155,7 @@
             <td style="text-align: center;">
                 <br><br>
                 Admin LPP,<br>
+                <br><br><br><br>
                 <div class="tanda-tangan-line" style="margin: 0 auto;"></div>
                 <div class="tanda-tangan-line" style="margin: 0 auto;"></div>
                 (Neni Nur Aini, S.Sos.)
@@ -222,6 +165,7 @@
             <td style="text-align: center;">
                 Mengetahui<br>
                 Kepala Cabang,<br>
+                <br><br><br><br>
                 <div class="tanda-tangan-line" style="margin: 0 auto;"></div>
                 <div class="tanda-tangan-line" style="margin: 0 auto;"></div>
                 (Priyo Sigit Purnomo,S.Kom.)
@@ -236,6 +180,7 @@
             <td style="text-align: center;">
                 <div class="tanda-tangan-line" style="margin: 0 auto;"></div>
                 Kasir,<br>
+                <br><br><br><br>
                 <div class="tanda-tangan-line" style="margin: 0 auto;"></div>
                 <div class="tanda-tangan-line" style="margin: 0 auto;"></div>
                 (Khusnul Ma'arif)
@@ -244,6 +189,77 @@
             </td>
         </tr>
     </table>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', (event) => {
+            var distribusiId = window.location.pathname.split('/').pop();
+
+            document.getElementById('cetak').addEventListener('click', function() {
+                var url = '/apps/cetak/' + distribusiId;
+                window.location.href = url;
+            });
+        });
+        // Ambil data dari API menggunakan fetch
+        var distribusiId = window.location.pathname.split('/').pop();
+        fetch('/api/admin/manajemen/distribusi-barang/' + distribusiId, {
+                method: 'GET'
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Isi data barang
+                let dataBarangHtml = '';
+                let totalJumlah = 0;
+                data.distribusibarangs.forEach((barang, index) => {
+                    dataBarangHtml += `
+                <tr>
+                    <td class="text-center">${index + 1}</td>
+                    <td class="text-center">${barang.nama_barang}</td>
+                    <td class="text-center">${barang.volume}</td>
+                    <td class="text-center">${barang.satuan}</td>
+                    <td class="text-center">${barang.harga_satuan}</td>
+                    <td class="text-center">${barang.jumlah}</td>
+                </tr>
+            `;
+                    totalJumlah += parseInt(barang.jumlah);
+                });
+                document.getElementById('data-barang').innerHTML = dataBarangHtml;
+                document.getElementById('total-jumlah').textContent = totalJumlah.toLocaleString();
+
+                // Isi informasi distribusi (tanggal, program, anggaran, pengeluaran, sisa)
+                let dataAnggaranHtml = '';
+                if (data.distribusi) {
+                    dataAnggaranHtml += `
+                <tr>
+                    <td colspan="6" style="padding: 5px; text-align: left;">
+                        Tanggal : ${data.distribusi.tanggal}
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="6" style="padding: 5px; text-align: left;">
+                        Program : ${data.program.nama_program}
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="3" style="padding: 5px; text-align: left;">
+                        Dropingan : Rp. ${data.distribusi.anggaran.toLocaleString()}
+                    </td>
+                </tr>
+                <tr>
+                     <td colspan="3" style="padding: 5px; text-align: left;">
+                        Total Pengeluaran : Rp. ${data.distribusi.pengeluaran.toLocaleString()}
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="6" style="padding: 5px; text-align: left;">
+                        Sisa : Rp. ${data.distribusi.sisa.toLocaleString()}
+                    </td>
+                </tr>
+            `;
+                }
+                document.getElementById('data-anggaran').innerHTML = dataAnggaranHtml;
+            })
+            .catch(error => console.error('Error:', error));
+    </script>
 </body>
 
 </html>

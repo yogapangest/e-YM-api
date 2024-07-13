@@ -17,16 +17,16 @@ class DatabaseSeeder extends Seeder
             'name' => 'admin',
             'email' => 'admin@gmail.com',
             'username' => 'admin',
-            'alamat' => 'yatimmandiri',
-            'telephone' => '0812768915',
+            'alamat' => 'yatimmandiri1',
+            'telephone' => '0812768913',
             'password' => '12345678',
             'role' => 'Admin',
         ]);
         User::factory()->create([
             'name' => 'User',
-            'email' => 'User@gmail.com',
+            'email' => 'user@gmail.com',
             'username' => 'user',
-            'alamat' => 'yatimmandiri',
+            'alamat' => 'yatimmandiri2',
             'telephone' => '0812768915',
             'password' => '12345678',
             'role' => 'User'

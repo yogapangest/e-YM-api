@@ -8,6 +8,7 @@ use App\Models\BuktiDonasi;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Log;
 
 class FormDonasiController extends Controller
 {
@@ -42,10 +43,12 @@ class FormDonasiController extends Controller
             $validatedData = $request->validate([
                 'nominal' => 'required|string|max:255',
                 'deskripsi' => 'required|string',
-                'file' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,pdf,doc,docx,jpg,png|max:2048',
-                'users_id' => 'required|integer|exists:users,id',
+                'file' => 'nullable|mimes:jpeg,png,jpg,gif,svg,pdf,doc,docx,jpg,png|max:2048',
 
             ]);
+
+            $validatedData['users_id'] = $request->user()->id;
+
             if ($request->hasFile('file')) {
                 $files = $request->file('file');
                 if ($files->isValid()) {
@@ -102,7 +105,7 @@ class FormDonasiController extends Controller
             $validatedData = $request->validate([
                 'nominal' => 'required|string|max:255',
                 'deskripsi' => 'required|string',
-                'file' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,pdf,doc,docx,jpg,png|max:2048',
+                'file' => 'nullable|mimes:jpeg,png,jpg,gif,svg,pdf,doc,docx,jpg,png|max:2048',
             ]);
 
             if ($request->hasFile('file')) {
@@ -117,7 +120,7 @@ class FormDonasiController extends Controller
             } else {
                 $validatedData['file'] = $donasis->file;
             }
-            
+
             $donasis->update($validatedData);
             $url = '/admin/donasi';
 

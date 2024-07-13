@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\API\Admin;
 
-use PDF;
+use TCPDF;
 use Exception;
 use Carbon\Carbon;
 use App\Models\Distribusi;
@@ -64,7 +64,7 @@ class CetakPdfController extends Controller
         $pdf->SetFont('Helvetica', '', 12);
 
         // Render view cetak_data.blade.php dengan data distribusi_barang
-        $html = view('page.manajemen_data_barang.cetak_data', compact('distribusi_barang'))->render();
+        $html = view('page.distribusi_barang.cetak_data', compact('distribusi_barang'))->render();
 
         // Ubah path gambar ke path absolut
         $html = str_replace('src="{{ asset(', 'src="' . public_path(), $html);

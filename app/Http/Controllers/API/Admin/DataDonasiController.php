@@ -6,7 +6,7 @@ use Exception;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
-use Illuminate\Support\Facades\Validator; 
+use Illuminate\Support\Facades\Validator;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
 
@@ -15,7 +15,7 @@ class DataDonasiController extends Controller
     public function index()
     {
         try {
-            $users = User::role('user')->get();
+            $users = User::where('role','User')->get();
 
             $url = '/admin/user';
 
@@ -36,6 +36,8 @@ class DataDonasiController extends Controller
 
     public function store(Request $request)
     {
+        // dd($request);
+
         $validator = Validator::make($request->all(), [
             'name' => 'required',
             'email' => 'required|email|unique:users,email',
@@ -46,6 +48,7 @@ class DataDonasiController extends Controller
             'confirm_password' => 'required|same:password'
         ]);
 
+
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
@@ -54,13 +57,12 @@ class DataDonasiController extends Controller
             ], 422); // Mengembalikan response dengan HTTP status code 422 (Unprocessable Entity)
         }
 
+
         $input = $request->all();
         $input['password'] = bcrypt($input['password']);
+        $input['role'] = 'User';
 
         $user = User::create($input);
-
-        // Assign role to user
-        $user->assignRole('user'); // Pastikan bahwa peran 'user' telah ada dalam sistem
 
         $success['email'] = $user->email;
         $success['name'] = $user->name;
@@ -85,7 +87,7 @@ class DataDonasiController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'User data retrieved successfully',
-                'data' => $user,
+                'user' => $user,
             ]);
         } catch (Exception $e) {
             // Handle errors
@@ -102,11 +104,9 @@ class DataDonasiController extends Controller
         $validator = Validator::make($request->all(), [
             'name' => 'required',
             'email' => 'required|email|unique:users,email,' . $id,
-            'username' => 'required',
             'alamat' => 'required',
             'telephone' => 'required|max:15',
-            'password' => 'sometimes|min:6',
-            'confirm_password' => 'sometimes|same:password'
+
         ]);
 
         if ($validator->fails()) {
@@ -154,9 +154,9 @@ class DataDonasiController extends Controller
 
             $datadonasis->delete();
             $url = '/admin/datadonasi';
-            
+
             return response()->json([
-                'status' => 'seccess',
+                'status' => 'success',
                 'message' => 'data donasi has been removed',
                 'url' => $url,
             ]);

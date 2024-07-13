@@ -74,10 +74,15 @@ class DashboardController extends Controller
         foreach ($allMonths as $month) {
             $monthlyDonationsFinal[] = isset($monthlyDonations[$month]) ? $monthlyDonations[$month]->total : 0;
         }
+        // total setahun
+        $totalDonasiKeseluruhan = array_sum($monthlyDonationsFinal);
+        $totalDonasiKeseluruhanFormatted = number_format($totalDonasiKeseluruhan, 0, ',', '.');
+
 
         $monthlyDonationsFormatted = collect($monthlyDonationsFinal)->map(function ($donation) {
             return number_format($donation, 0, ',', '.');
         });
+
 
         // Prepare data for admin dashboard
         $rekapDonasi = $monthlyDonationsFinal;
@@ -95,6 +100,7 @@ class DashboardController extends Controller
                 'totalDonasi' => $totalDonasiFormatted,
             ],
             'donationData' => $donationData,
+            'monthlyDonationsFinal'=>$monthlyDonationsFinal,
             'months' => $months,
             'adminData' => [
                 'totalDonasiAdmin' => $totalDonasi,
@@ -102,7 +108,9 @@ class DashboardController extends Controller
                 'monthlyDonations' => $monthlyDonations,
                 'rekapDonasi' => $rekapDonasi,
                 'monthlyDonationsFormatted' => $monthlyDonationsFormatted,
-            ]
+                'rekapDonasiAdmin'=>$monthlyDonationsFinal,
+            ],
+            'totalDonasiKeseluruhan' => $totalDonasiKeseluruhanFormatted,
         ]);
     } catch (Exception $e) {
         Log::error('Failed to fetch dashboard data: ' . $e->getMessage());

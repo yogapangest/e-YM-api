@@ -37,10 +37,10 @@ Route::post('login', [AuthController::class, 'login']);
 
 Route::post('logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
 
+    Route::get('dashboard', [DashboardController::class, 'index']);
 
 Route::prefix('admin/')->middleware('auth:sanctum')->group( function (){
 
-    Route::get('dashboard', [DashboardController::class, 'index']);
     //manajemen program
     Route::get('manajemen/program', [ProgramController::class, 'index']);
     Route::post('manajemen/program', [ProgramController::class, 'store']);
@@ -66,7 +66,9 @@ Route::prefix('admin/')->middleware('auth:sanctum')->group( function (){
     Route::put('manajemen/distribusi-barang/update/{id}', [DistribusiBarangController::class, 'update']);
     Route::delete('manajemen/distribusi-barang/delete/{id}', [DistribusiBarangController::class, 'destroy']);
     //manajemen distribusi cetak pdf
-    Route::get('cetakpdf/{distribusis_id}', [CetakPdfController::class, 'cetakPDF']);
+    Route::get('cetakpdf/{distribusis_id}', [CetakPdfController::class, 'cetakPDF2']);
+    Route::get('/cetak/{distribusis_id}', [DistribusiBarangController::class, 'cetakPDF']);
+
 });
 
 

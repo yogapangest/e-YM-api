@@ -117,9 +117,13 @@ Route::prefix('apps')->middleware(['auth:sanctum', 'CheckRole:Admin;User'])->gro
     Route::get('/donasi/view/{user_id}', function(){
         return view('page.manajemen_donasi.show');
     })->name('form.show.donasi_admin');
-    Route::get('/donasi/{user_id}/create', [AdminDonasiController::class, 'createform'])->name('form.create.donasi_admin');
+    Route::get('/donasi/{user_id}/create', function(){
+        return view('page.manajemen_donasi.formadmin');
+    })->name('form.create.donasi_admin');
     Route::post('/donasi/{user_id}/store', [AdminDonasiController::class, 'storeform'])->name('form.store.donasi_admin');
-    Route::get('/donasi/form/{id}/editform',[AdminDonasiController::class, 'editform'])->name('form.edit.donasi_admin');
+    Route::get('/donasi/form/{id}/editform',function(){
+        return view('page.manajemen_donasi.editadmin');
+    })->name('form.edit.donasi_admin');
     Route::put('/donasi/form/{id}/updateform',[AdminDonasiController::class, 'updateform'])->name('form.update.donasi_admin');
     Route::delete('/donasi/form/{id}/destroy',[AdminDonasiController::class, 'destroy'])->name('form.destroy.donasi_admin');
 
@@ -130,9 +134,7 @@ Route::prefix('apps')->middleware(['auth:sanctum', 'CheckRole:Admin;User'])->gro
     Route::get('/donasi/user/form/create', function(){
         return view('page.manajemen_donasi.form');
     })->name('form.create.donasi');
-    Route::post('/donasi/user/form/store', [DonasiController::class, 'store'])->name('form.store.donasi');
     Route::get('/donasi/form/{id}/edit', [DonasiController::class, 'edit'])->name('form.edit.donasi');
-    Route::put('/donasi/form/{id}/update', [DonasiController::class, 'update'])->name('form.update.donasi');
 
 
     //manajemen data_donasi
@@ -163,11 +165,17 @@ Route::prefix('apps')->middleware(['auth:sanctum', 'CheckRole:Admin;User'])->gro
 
 
     //profile
-    Route::get('/profile/show/{id_user}',[ProfileController::class, 'show'])->name('index.view.profile');
+    Route::get('/profile/show/{id_user}',function(){
+        return view('page.manajemen_profile.index');
+    })->name('index.view.profile');
     Route::put('/ubah-profile/{id_user}/update',[ProfileController::class, 'update'])->name('index.update.profile');
 
     //cetak lpj
-    Route::get('/cetak/{distribusi_id}', [DistribusiBarangController::class, 'cetakPDF'])->name('cetak.pdf');
+    Route::get('/cetak/{distribusi_id}', function(){
+        return view('page.distribusi_barang.cetak_data');
+    })->name('cetak.pdf');
+    Route::get('/download-laporan/{distribusiId}', 'DistribusiBarangController@download')->name('download.laporan');
+
 
     //konten penyaluran
     Route::get('/konten_penyaluran/view',function(){

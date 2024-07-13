@@ -22,7 +22,7 @@
                                 <h4>Daftar Donasi</h4>
                                 <div class="card-header-form">
                                     <div class="ml-auto mb-2">
-                                        <a href="#" style="float: right;"
+                                        <a id="tambah" href="#" style="float: right;"
                                             class="btn btn-round btn-primary mb-3">Tambah</a>
                                     </div>
                                     <form>
@@ -62,8 +62,16 @@
         crossorigin="anonymous"></script>
     <script>
         $(document).ready(function() {
+
             var userId = window.location.pathname.split('/').pop();
 
+            $('#tambah').on('click', function() {
+                var url = '/apps/donasi/' + userId + '/create/';
+                window.location.href = url;
+
+            });
+
+            // var userId = window.location.pathname.split('/').pop();
             $.ajax({
                 url: '/api/admin/manajemen/rekap-donasi/' + userId,
                 method: 'GET',
@@ -86,7 +94,7 @@
                             row.append('<td>' + index + '</td>');
                             row.append('<td>' + formattedDate + '</td>');
                             row.append('<td>' + donasi.deskripsi + '</td>');
-                            row.append('<td>' + donasi.nominal + '</td>');
+                            row.append('<td>' + formatRupiah(donasi.nominal) + '</td>');
 
 
                             var fileUrl = donasi.file; // URL file
@@ -113,11 +121,13 @@
                                 }
                             }
 
-                            row.append('<td><a href="' + '/apps/donasi/' + donasi.id +
-                                '/edit' +
-                                '" class="mr-1 btn btn-primary">Edit</a><button data-id="' +
+                            row.append(
+                                '<td style="display: flex; justify-content: center; align-items: center;"><a href="' +
+                                '/apps/donasi/form/' + donasi.id +
+                                '/editform' +
+                                '" class="mr-1 btn btn-primary"><i class="fas fa-edit"></i></a><button data-id="' +
                                 donasi.id +
-                                '" class="btn btn-danger delete-button">Delete</button></td>'
+                                '" class="btn btn-danger delete-button"><i class="fas fa-trash-alt"></i></button></td>'
                             );
 
 
@@ -129,9 +139,9 @@
                         });
 
                         $('.delete-button').on('click', function() {
-                            var id_donasi = $(this).data('id');
-                            console.log(id_donasi);
-                            deleteProgram(id_donasi, $(this).closest('tr'));
+                            var id_rekap_admin = $(this).data('id');
+                            console.log(id_rekap_admin);
+                            deleteRekapAdmin(id_rekap_admin, $(this).closest('tr'));
 
                         });
                     }
@@ -140,6 +150,16 @@
                     console.error('There has been a problem with your AJAX operation:', error);
                 }
             });
+
+            function formatRupiah(number) {
+                // Ubah number menjadi string dan tambahkan Rp di depannya
+                let formattedNumber = 'Rp ' + number.toString();
+
+                // Tambahkan titik sebagai pemisah ribuan
+                formattedNumber = formattedNumber.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+
+                return formattedNumber;
+            }
 
             // Fungsi untuk format tanggal dan waktu
             function formatTanggal(date) {
@@ -156,10 +176,10 @@
                 return tanggal + ' ' + bulanNama + ' ' + tahun + ' ' + jam + ':' + menit + ':' + detik;
             }
 
-            function deleteProgram(id_donasi, row) {
-                if (confirm('Apa Anda yakin ingin menghapus kegiatan ini?')) {
+            function deleteRekapAdmin(id_rekap_admin, row) {
+                if (confirm('Apa Anda yakin ingin menghapus Rekap ini?')) {
                     $.ajax({
-                        url: '/api/admin/manajemen/formdonasi/delete/' + id_donasi,
+                        url: '/api/admin/manajemen/rekap-donasi/delete/' + id_rekap_admin,
                         method: 'DELETE',
                         headers: {
                             'X-CSRF-TOKEN': '{{ csrf_token() }}'

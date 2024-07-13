@@ -14,8 +14,6 @@ class RekapDonasiController extends Controller
     public function index($id)
     {
         try {
-            // Cari pengguna berdasarkan ID
-            $user = User::findOrFail($id);
 
             // Ambil data donasi berdasarkan users_id
             $donasis = BuktiDonasi::where('users_id', $id)->get();
@@ -45,12 +43,8 @@ class RekapDonasiController extends Controller
                 'nominal' => 'required|string|max:255',
                 'deskripsi' => 'required|string',
                 'file' => 'nullable|mimes:jpeg,png,jpg,gif,svg,pdf,doc,docx,jpg,png|max:2048',
-                // 'users_id' => 'required|integer|exists:users,id',
+                'users_id' => 'required|integer|exists:users,id',
             ]);
-
-            // Gunakan ID pengguna yang terotentikasi
-            dd($request->user()->id);
-            $validatedData['users_id'] = $request->user()->id;
 
             if ($request->hasFile('file')) {
                 $file = $request->file('file');
@@ -63,6 +57,8 @@ class RekapDonasiController extends Controller
 
             $donasi = BuktiDonasi::create($validatedData);
             $url = '/admin/donasi';
+
+
 
             return response()->json([
                 'status' => 'success',
@@ -84,7 +80,7 @@ class RekapDonasiController extends Controller
     {
         try {
             $donasi = BuktiDonasi::findOrFail($id);
-            $url = sprintf('/admin/donasi/edit/%d', $id);
+            $url = sprintf('/admin/donasi/view/%d', $id);
 
             return response()->json([
                 'status' => 'success',
@@ -125,9 +121,10 @@ class RekapDonasiController extends Controller
             } else {
                 $validatedData['file'] = $donasi->file;
             }
-
+            $userId = $donasi->users_id;
             $donasi->update($validatedData);
-            $url = '/admin/donasi';
+            $url = sprintf('/apps/donasi/view/%d', $userId);
+
 
             return response()->json([
                 'status' => 'success',

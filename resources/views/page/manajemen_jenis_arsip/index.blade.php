@@ -85,11 +85,14 @@
                             row.append('<td>' + jenisarsips.deskripsi + '</td>');
 
 
-                            row.append('<td><a href="' + '/apps/jenis-arsip/' + jenisarsips.id +
+                            row.append(
+                                '<td style="display: flex; justify-content: center; align-items: center;"><a href="' +
+                                '/apps/jenis-arsip/' + jenisarsips
+                                .id +
                                 '/edit' +
-                                '" class="mr-1 btn btn-primary">Edit</a><button data-id="' +
+                                '" class="mr-1 btn btn-primary"><i class="fas fa-edit"></i></a><button data-id="' +
                                 jenisarsips.id +
-                                '" class="btn btn-danger delete-button">Delete</button></td>'
+                                '" class="btn btn-danger delete-button"><i class="fas fa-trash-alt"></i></button></td>'
                             );
 
 

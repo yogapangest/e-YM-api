@@ -24,10 +24,9 @@
                     </div>
                     <div class="col-12 col-md-12 col-lg-7">
                         <div class="card">
-                            <form method="post" action="{{ route('index.update.profile', $user->id) }}"
-                                class="needs-validation" novalidate>
+                            <form id="UpdateForm" method="post" class="needs-validation" novalidate>
                                 @csrf
-                                @method('PUT')
+
                                 <div class="card-header">
                                     <h4>Edit Profile</h4>
                                 </div>
@@ -35,8 +34,8 @@
                                     <div class="form-group">
                                         <label for="name">Name</label>
                                         <input id="name" type="name"
-                                            class="form-control @error('name') is-invalid @enderror" name="name"
-                                            value="{{ old('name', $user->name) }}" required autocomplete="name">
+                                            class="form-control @error('name') is-invalid @enderror" name="name" required
+                                            autocomplete="name">
                                         @error('name')
                                             <span class="invalid-feedback" role="alert">
                                                 <strong>{{ $message }}</strong>
@@ -48,7 +47,7 @@
                                         <label for="email">Email</label>
                                         <input id="email" type="email"
                                             class="form-control @error('email') is-invalid @enderror" name="email"
-                                            value="{{ old('email', $user->email) }}" required autocomplete="email">
+                                            required autocomplete="email">
                                         @error('email')
                                             <span class="invalid-feedback" role="alert">
                                                 <strong>{{ $message }}</strong>
@@ -60,7 +59,7 @@
                                         <label for="username">Username</label>
                                         <input id="username" type="text"
                                             class="form-control @error('username') is-invalid @enderror" name="username"
-                                            value="{{ old('username', $user->username) }}" required autocomplete="username">
+                                            required autocomplete="username">
                                         @error('username')
                                             <span class="invalid-feedback" role="alert">
                                                 <strong>{{ $message }}</strong>
@@ -71,8 +70,7 @@
                                     <div class="form-group">
                                         <label for="alamat">Alamat</label>
                                         <input id="alamat" type="text"
-                                            class="form-control @error('alamat') is-invalid @enderror" name="alamat"
-                                            value="{{ old('alamat', $user->alamat) }}">
+                                            class="form-control @error('alamat') is-invalid @enderror" name="alamat">
                                         @error('alamat')
                                             <span class="invalid-feedback" role="alert">
                                                 <strong>{{ $message }}</strong>
@@ -83,8 +81,7 @@
                                     <div class="form-group">
                                         <label for="telephone">Telephone</label>
                                         <input id="telephone" type="text"
-                                            class="form-control @error('telephone') is-invalid @enderror" name="telephone"
-                                            value="{{ old('telephone', $user->telephone) }}">
+                                            class="form-control @error('telephone') is-invalid @enderror" name="telephone">
                                         @error('telephone')
                                             <span class="invalid-feedback" role="alert">
                                                 <strong>{{ $message }}</strong>
@@ -122,4 +119,61 @@
             </div>
         </section>
     </div>
+    <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4="
+        crossorigin="anonymous"></script>
+    </script>
+    <script>
+        $(document).ready(function() {
+
+            var userId = window.location.pathname.split('/')[4];
+
+
+            $.ajax({
+                url: '/api/admin/manajemen/data-donasi/edit/' + userId,
+                method: 'GET',
+                success: function(data) {
+
+                    $('#name').val(data.user.name);
+                    $('#email').val(data.user.email);
+                    $('#username').val(data.user.username);
+                    $('#alamat').val(data.user.alamat);
+                    $('#telephone').val(data.user.telephone);
+                    $('#password').val(data.user.password);
+                    $('#confirm_password').val(data.user.confirm_password);
+
+                },
+                error: function(xhr, status, error) {
+                    console.error('There has been a problem with your AJAX operation:', error);
+                }
+
+            });
+
+            $('#UpdateForm').submit(function(event) {
+                event.preventDefault();
+
+                var formData = new FormData(this);
+                // formData.append('email', $('#email').val());
+
+
+                $.ajax({
+                    url: '/api/admin/manajemen/data-donasi/update/' + userId,
+                    method: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'X-HTTP-Method-Override': 'PUT' // Method Override untuk menggunakan PUT
+                    },
+                    success: function(data) {
+                        window.location.href = '/apps/profile/show/' + userId;
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('There has been a problem with your AJAX operation:',
+                            error);
+                    }
+                });
+            });
+        });
+    </script>
 @endsection

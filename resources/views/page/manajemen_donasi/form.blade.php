@@ -24,13 +24,13 @@
                                     @enderror
                                 </div>
                                 <div class="form-group">
-                                    <label for="nominal">Nominal</label>
-                                    <input id="nominal" type="text"
-                                        class="form-control @error('nominal') is-invalid @enderror" name="formatted_nominal"
-                                        placeholder="Nominal" oninput="formatNominal(this)">
-                                    <input id="hidden_nominal" type="hidden" name="nominal">
+                                    <label for="nominal_display">Nominal</label>
+                                    <input id="nominal_display" type="text"
+                                        class="form-control @error('nominal_display') is-invalid @enderror"
+                                        name="nominal_display" placeholder="Nominal" value="{{ old('nominal_display') }}">
+                                    <input id="nominal" type="hidden" name="nominal">
                                     @error('nominal')
-                                        <div id="nominal" class="form-text"></div>
+                                        <div id="nominal-error" class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
                                 <div class="form-group">
@@ -47,19 +47,20 @@
                                     </button>
                                 </div>
                                 <script>
-                                    function formatNominal(input) {
-                                        let value = input.value.replace(/\D/g, ''); // Hanya menyisakan angka
-                                        document.getElementById('hidden_nominal').value = value; // Simpan nilai asli tanpa titik
-                                        value = value.replace(/\B(?=(\d{3})+(?!\d))/g, '.'); // Menambahkan titik setiap 3 angka
-                                        input.value = value;
-                                    }
+                                    document.getElementById('nominal_display').addEventListener('input', function(e) {
+                                        let displayValue = e.target.value.replace(/\D/g, ''); // Hapus semua karakter non-digit
+                                        let formattedValue = displayValue.replace(/\B(?=(\d{3})+(?!\d))/g,
+                                            '.'); // Tambahkan titik setiap 3 angka
+                                        e.target.value = formattedValue;
 
-                                    // Tambahkan event listener untuk mengonversi nilai ke format Rupiah sebelum form disubmit
-                                    document.querySelector('form').addEventListener('submit', function() {
-                                        let formattedNominal = document.getElementById('nominal').value;
-                                        let nominalValue = formattedNominal.replace(/\./g,
-                                            ''); // Hapus semua titik untuk mendapatkan nilai numerik asli
-                                        document.getElementById('hidden_nominal').value = nominalValue; // Update nilai hidden input
+                                        // Set nilai asli tanpa format ke hidden input
+                                        document.getElementById('nominal').value = displayValue;
+                                    });
+
+                                    document.querySelector('form').addEventListener('submit', function(e) {
+                                        let displayValue = document.getElementById('nominal_display').value;
+                                        let actualValue = displayValue.replace(/\./g, ''); // Hapus titik sebelum submit
+                                        document.getElementById('nominal').value = actualValue;
                                     });
                                 </script>
 

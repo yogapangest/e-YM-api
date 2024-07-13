@@ -66,7 +66,9 @@ Route::prefix('admin/')->middleware('auth:sanctum')->group( function (){
     Route::put('manajemen/distribusi-barang/update/{id}', [DistribusiBarangController::class, 'update']);
     Route::delete('manajemen/distribusi-barang/delete/{id}', [DistribusiBarangController::class, 'destroy']);
     //manajemen distribusi cetak pdf
-    Route::get('cetakpdf/{distribusis_id}', [CetakPdfController::class, 'cetakPDF']);
+    Route::get('cetakpdf/{distribusis_id}', [CetakPdfController::class, 'cetakPDF2']);
+    Route::get('/cetak/{distribusis_id}', [DistribusiBarangController::class, 'cetakPDF']);
+
 });
 
 

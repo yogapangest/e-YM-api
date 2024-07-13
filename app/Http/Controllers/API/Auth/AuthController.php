@@ -11,29 +11,6 @@ use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
 {
-    // public function login(Request $request)
-    // {
-    //     // dd($request);
-    //     $credentials = $request->only('email', 'password');
-
-    //     if (Auth::attempt($credentials)) {
-    //         $authUser = Auth::user();
-    //         $success['token'] = $authUser->createToken('auth_token')->plainTextToken;
-    //         $success['name'] = $authUser->name;
-
-    //         return response()->json([
-    //             'success' => true,
-    //             'message' => 'Login Berhasil',
-    //             'data' => $success
-    //         ]);
-    //     } else {
-    //         return response()->json([
-    //             'success' => false,
-    //             'message' => 'Cek kembali email dan password',
-    //             'data' => null
-    //         ], 401); // Mengembalikan response dengan HTTP status code 401 (Unauthorized)
-    //     }
-    // }
     public function register(Request $request)
     {
         $validatedData = $request->validate([

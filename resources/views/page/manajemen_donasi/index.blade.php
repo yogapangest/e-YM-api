@@ -83,7 +83,7 @@
                             row.append('<td>' + index + '</td>');
                             row.append('<td>' + formattedDate + '</td>');
                             row.append('<td>' + donasi.deskripsi + '</td>');
-                            row.append('<td>' + donasi.nominal + '</td>');
+                            row.append('<td>' + formatRupiah(donasi.nominal) + '</td>');
 
 
                             var fileUrl = donasi.file; // URL file
@@ -110,11 +110,13 @@
                                 }
                             }
 
-                            row.append('<td><a href="' + '/apps/donasi/' + donasi.id +
+                            row.append(
+                                '<td style="display: flex; justify-content: center; align-items: center;"><a href="' +
+                                '/apps/donasi/' + donasi.id +
                                 '/edit' +
-                                '" class="mr-1 btn btn-primary">Edit</a><button data-id="' +
+                                '" class="mr-1 btn btn-primary"><i class="fas fa-edit"></i></a><button data-id="' +
                                 donasi.id +
-                                '" class="btn btn-danger delete-button">Delete</button></td>'
+                                '" class="btn btn-danger delete-button"><i class="fas fa-trash-alt"></i></button></td>'
                             );
 
 
@@ -137,6 +139,10 @@
                     console.error('There has been a problem with your AJAX operation:', error);
                 }
             });
+
+            function formatRupiah(number) {
+                return 'Rp ' + number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+            }
 
             // Fungsi untuk format tanggal dan waktu
             function formatTanggal(date) {

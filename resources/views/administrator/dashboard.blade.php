@@ -57,7 +57,7 @@
                                         <div class="card-header">
                                             <h4>Jumlah Donasi</h4>
                                         </div>
-                                        <div class="card-body" id="totalDonasiAdminFormatted">
+                                        <div class="card-body" id="totalDonasiAdmin">
                                             <!-- Jumlah Donasi akan diisi dengan JavaScript -->
                                         </div>
                                     </div>
@@ -166,7 +166,6 @@
                 url: "{{ url('/api/dashboard') }}",
                 method: 'GET',
                 success: function(data) {
-                    console.log(data)
                     $('#totalDistribusi').text(data.totals.totalDistribusi);
                     $('#totalArsip').text(data.totals.totalArsip);
                     $('#totalDonatur').text(data.totals.totalDonatur);
@@ -174,6 +173,7 @@
                     $('#totalGuest').text(data.totals.totalUser);
                     $('#totalDonasiFormatted').text(data.totals.totalDonasi);
                     $('#totalDonasiAdminFormatted').text(data.adminData.totalDonasiAdminFormatted);
+                    $('#totalDonasiAdmin').text(data.totalDonasiKeseluruhan);
 
                     var ctx = $('#donationChart');
                     if (ctx.length) {
@@ -183,7 +183,7 @@
                                 labels: data.months,
                                 datasets: [{
                                     label: 'Total Donasi',
-                                    data: data.donationDataAdmin,
+                                    data: data.monthlyDonationsFinal,
                                     backgroundColor: "#6777EF",
                                     borderColor: "#2E3192",
                                     borderWidth: 1

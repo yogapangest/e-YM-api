@@ -8,6 +8,8 @@ use Illuminate\Http\Request;
 use App\Models\DistribusiBarang;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\File;
+use Carbon\Carbon;
+use TCPDF;
 
 class DistribusiBarangController extends Controller
 {
@@ -198,4 +200,57 @@ class DistribusiBarangController extends Controller
             ], 500);
         }
     }
+
+    public function cetakPDF($distribusis_id)
+{
+    try {
+        // Mengambil data distribusi barang berdasarkan ID distribusi
+        $distribusi_barang = DistribusiBarang::where('distribusis_id', $distribusis_id)->get();
+        if ($distribusi_barang->isEmpty()) {
+            return response()->json(['message' => 'Distribusi barang tidak ditemukan'], 404);
+        }
+
+        // Mengambil data distribusi berdasarkan ID
+        $distribusi = Distribusi::find($distribusis_id);
+        if (!$distribusi) {
+            return response()->json(['message' => 'Distribusi tidak ditemukan'], 404);
+        }
+
+        // Mengakses relasi program dari distribusi
+        $program = $distribusi->program;
+        $tanggal = Carbon::now()->translatedFormat('d F Y');
+        $namaProgram = $program->nama;
+
+        // Menginisialisasi TCPDF
+        $pdf = new TCPDF('P', 'mm', 'A4', true, 'UTF-8', false);
+        $pdf->SetCreator('Creator');
+        $pdf->SetAuthor('Author');
+        $pdf->SetTitle($namaProgram . ' - ' . $tanggal);
+        $pdf->setPrintHeader(false);
+
+        // Menambahkan halaman baru dan mengatur font
+        $pdf->AddPage();
+        $pdf->SetFont('Helvetica', '', 12);
+
+        // Mengambil view dan mengubah path gambar ke path absolut
+        $html = view('page.distribusi_barang.cetak_data', compact('distribusi_barang'))->render();
+        $html = str_replace('src="{{ asset(', 'src="' . public_path(), $html);
+
+        // Menulis HTML ke dalam PDF
+        $pdf->writeHTML($html, true, false, true, false, '');
+
+        // Menyimpan PDF ke dalam variabel $pdfContent
+        $pdfContent = $pdf->Output($namaProgram.'-'.$tanggal, 'S'); // 'S' untuk mengembalikan PDF sebagai string
+
+        // Mengirimkan PDF sebagai respons untuk diunduh
+        return response($pdfContent)
+            ->header('Content-Type', 'application/pdf')
+            ->header('Content-Disposition', 'attachment; filename="laporan_data_barang.pdf"');
+    } catch (\Exception $e) {
+        return response()->json(['message' => 'Terjadi kesalahan saat menghasilkan PDF', 'error' => $e->getMessage()], 500);
+    }
+}
+
+
+
 }

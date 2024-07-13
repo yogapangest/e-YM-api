@@ -106,8 +106,6 @@ class KontenProgramController extends Controller
                 $FileName = uniqid('kontenprogram_') . '.' . $files->getClientOriginalExtension();
                 $files->move(public_path('file/kontenprogram'), $FileName);
                 $validatedData['foto'] = $FileName;
-            } else {
-                $validatedData['foto'] = $donasis->file;
             }
             $kontenprograms->update($validatedData);
             $url = '/apps/konten_program/view';

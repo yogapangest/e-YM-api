@@ -43,7 +43,7 @@ class FormDonasiController extends Controller
             $validatedData = $request->validate([
                 'nominal' => 'required|string|max:255',
                 'deskripsi' => 'required|string',
-                'file' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,pdf,doc,docx,jpg,png|max:2048',
+                'file' => 'nullable|mimes:jpeg,png,jpg,gif,svg,pdf,doc,docx,jpg,png|max:2048',
 
             ]);
 
@@ -105,7 +105,7 @@ class FormDonasiController extends Controller
             $validatedData = $request->validate([
                 'nominal' => 'required|string|max:255',
                 'deskripsi' => 'required|string',
-                'file' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,pdf,doc,docx,jpg,png|max:2048',
+                'file' => 'nullable|mimes:jpeg,png,jpg,gif,svg,pdf,doc,docx,jpg,png|max:2048',
             ]);
 
             if ($request->hasFile('file')) {

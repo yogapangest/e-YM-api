@@ -90,11 +90,13 @@
                                 '" class="btn btn-primary"><i class="fas fa-clipboard-list"></i></a></td>'
                             );
 
-                            row.append('<td><a href="' + '/apps/data_donasi/' + user.id +
+                            row.append(
+                                '<td style="display: flex; justify-content: center; align-items: center;"><a href="' +
+                                '/apps/data_donasi/' + user.id +
                                 '/edit' +
-                                '" class="mr-1 btn btn-primary">Edit</a><button data-id="' +
+                                '" class="mr-1 btn btn-primary"><i class="fas fa-edit"></i></a><button data-id="' +
                                 user.id +
-                                '" class="btn btn-danger delete-button">Delete</button></td>'
+                                '" class="btn btn-danger delete-button"><i class="fas fa-trash-alt"></i></button></td>'
                             );
 
 

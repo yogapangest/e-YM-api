@@ -64,7 +64,7 @@ class ProgramControllerTest extends TestCase
          $response = $this->postJson('/api/admin/manajemen/program', [
              'nama_program' => 'Program Test',
              'deskripsi' => 'ujicoba',
-             'file' => null,
+             'file' => UploadedFile::fake()->image('program.jpg'),
          ]);
  
          Log::info($response->getContent());

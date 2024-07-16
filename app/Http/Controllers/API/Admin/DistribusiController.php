@@ -154,6 +154,13 @@ class DistribusiController extends Controller
                 'distribusi' => $distribusi,
                 'url' => $url,
             ]);
+        } catch (ValidationException $e) {
+            Log::error('Failed to update program: ' . $e->getMessage());
+            return response()->json([
+                'status' => 'error', 
+                'message' => 'Failed to update program', 
+                'errors' => $e->errors(),
+            ], 422);
         } catch (\Exception $e) {
             return response()->json([
                 'status' => 'error',

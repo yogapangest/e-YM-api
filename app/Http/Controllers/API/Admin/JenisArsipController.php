@@ -5,7 +5,9 @@ namespace App\Http\Controllers\API\Admin;
 use Exception;
 use App\Models\JenisArsip;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
+use Illuminate\Validation\ValidationException;
 
 class JenisArsipController extends Controller
 {
@@ -16,7 +18,7 @@ class JenisArsipController extends Controller
             // $url = '/apps/admin/jenisarsip';
 
             return response()->json([
-                'status' => 'succes',
+                'status' => 'success',
                 'message' => 'Get data jenisarsip successfull',
                 'jenisarsip' => $jenisarsips,
                 // 'url' => $url,
@@ -47,6 +49,14 @@ class JenisArsipController extends Controller
                 'jenisarsip' => $jenisarsips,
                 'url' => $url,
             ]);
+        } catch (ValidationException $e) {
+            Log::error('ed to add jenis arsip: ' . $e->getMessage());
+
+            return response()->json([
+                'status' => 'error',
+                'message' => 'ed to add jenis arsip',
+                'errors' => $e->errors()
+            ], 422);
         } catch (\Exception $e) {
             return response()->json([
                 'status' => 'error',
@@ -98,6 +108,13 @@ class JenisArsipController extends Controller
                 'jenisarsip' => $jenisarsips,
                 'url' => $url,
             ]);
+        } catch (ValidationException $e) {
+            Log::error('Failed to update jenis arsip: ' . $e->getMessage());
+            return response()->json([
+                'status' => 'error', 
+                'message' => 'Failed to update jenis arsip', 
+                'errors' => $e->errors(),
+            ], 422);
         } catch (\Exception $e) {
             return response()->json([
                 'status' => 'error',

@@ -5,8 +5,10 @@ namespace App\Http\Controllers\API\Admin;
 use Exception;
 use Illuminate\Http\Request;
 use App\Models\KontenProgram;
+use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\File;
+use Illuminate\Validation\ValidationException;
 
 class KontenProgramController extends Controller
 {
@@ -17,7 +19,7 @@ class KontenProgramController extends Controller
             $url = '/admin/kontenprogram';
 
             return response()->json([
-                'status' => 'succes',
+                'status' => 'success',
                 'message' => 'Get data konten program successfull',
                 'kontenprogram' => $kontenprograms,
                 'url' => $url,
@@ -56,6 +58,14 @@ class KontenProgramController extends Controller
                 'kontenprogram' => $kontenprograms,
                 'url' => $url,
             ]);
+        } catch (ValidationException $e) {
+            Log::error('ed to add konten program: ' . $e->getMessage());
+
+            return response()->json([
+                'status' => 'error',
+                'message' => 'ed to add konten program',
+                'errors' => $e->errors()
+            ], 422);
         } catch (\Exception $e) {
             return response()->json([
                 'status' => 'error',
@@ -94,7 +104,7 @@ class KontenProgramController extends Controller
 
             $validatedData = $request->validate([
                 'nama_kontenprogram' => 'required|string|max:255',
-                'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,jpg,png|max:2048',
+                'foto' => 'nullable|mimes:jpeg,png,jpg,gif,svg,jpg,png|max:2048',
             ]);
 
             if ($request->hasFile('foto')) {
@@ -112,10 +122,17 @@ class KontenProgramController extends Controller
 
             return response()->json([
                 'status' => 'success',
-                'message' => 'Update konten program seccesfull',
+                'message' => 'Update konten program successful',
                 'kontenprogram' => $kontenprograms,
                 'url' => $url,
             ]);
+        } catch (ValidationException $e) {
+            Log::error('Failed to update konten program: ' . $e->getMessage());
+            return response()->json([
+                'status' => 'error', 
+                'message' => 'Failed to update konten program', 
+                'errors' => $e->errors(),
+            ], 422);
         } catch (\Exception $e) {
             return response()->json([
                 'status' => 'error',

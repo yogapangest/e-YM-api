@@ -2,14 +2,16 @@
 
 namespace App\Http\Controllers\API\Admin;
 
+use TCPDF;
 use Exception;
+use Carbon\Carbon;
 use App\Models\Distribusi;
 use Illuminate\Http\Request;
 use App\Models\DistribusiBarang;
+use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\File;
-use Carbon\Carbon;
-use TCPDF;
+use Illuminate\Validation\ValidationException;
 
 class DistribusiBarangController extends Controller
 {
@@ -19,19 +21,18 @@ class DistribusiBarangController extends Controller
         try {
             $distribusi = Distribusi::findOrFail($distribusis_id);
             $distribusibarangs = DistribusiBarang::where('distribusis_id', $distribusis_id)->get();
-            $program = $distribusi->program->first();
             $url = '/admin/distribusibarangs';
-
 
             return response()->json([
                 'status' => 'success',
                 'message' => 'Get data distribusi barang successful',
                 'distribusi' => $distribusi,
                 'distribusibarangs' => $distribusibarangs,
-                'program' => $program,
                 'url' => $url,
             ]);
         } catch (Exception $e) {
+            Log::error('Failed to get distribusi barang: ' . $e->getMessage());
+
             return response()->json([
                 'status' => 'error',
                 'message' => 'Failed to get distribusi barang',
@@ -90,6 +91,14 @@ class DistribusiBarangController extends Controller
                 'distribusibarangs' => $distribusibarangs,
                 'url' => $url,
             ]);
+        } catch (ValidationException $e) {
+            Log::error('Validation error: ' . $e->getMessage());
+
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Validation error',
+                'errors' => $e->errors(),
+            ], 422);
         } catch (\Exception $e) {
             return response()->json([
                 'status' => 'error',
@@ -171,6 +180,14 @@ class DistribusiBarangController extends Controller
             'distribusibarang' => $distribusiBarang,
             'url' => $url,
         ]);
+    } catch (ValidationException $e) {
+        Log::error('Validation error: ' . $e->getMessage());
+
+        return response()->json([
+            'status' => 'error',
+            'message' => 'Validation error',
+            'errors' => $e->errors(),
+        ], 422);
     } catch (\Exception $e) {
         return response()->json([
             'status' => 'error',
@@ -195,7 +212,7 @@ class DistribusiBarangController extends Controller
 
             return response()->json([
                 'status' => 'success',
-                'message' => 'distribusi barang has been removed',
+                'message' => 'Distribusi barang has been removed',
                 'url' => $url,
             ]);
         } catch (\Exception $e) {

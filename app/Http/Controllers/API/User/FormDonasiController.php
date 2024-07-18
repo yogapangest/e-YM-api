@@ -6,9 +6,10 @@ use Exception;
 use App\Models\User;
 use App\Models\BuktiDonasi;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\ValidationException;
 
 class FormDonasiController extends Controller
 {
@@ -21,8 +22,8 @@ class FormDonasiController extends Controller
             $url = '/admin/donasi';
 
             return response()->json([
-                'status' => 'succes',
-                'message' => 'Get data donasi successfull',
+                'status' => 'success',
+                'message' => 'Get data donasi successful',
                 'donasi' => $donasis,
                 'url' => $url,
             ]);
@@ -66,6 +67,14 @@ class FormDonasiController extends Controller
                 'donasi' => $donasis,
                 'url' => $url,
             ]);
+        } catch (ValidationException $e) {
+            Log::error('Failed to add donasi: ' . $e->getMessage());
+
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Failed to add donasi',
+                'errors' => $e->errors()
+            ], 422);
         } catch (\Exception $e) {
             return response()->json([
                 'status' => 'error',
@@ -130,6 +139,14 @@ class FormDonasiController extends Controller
                 'donasi' => $donasis,
                 'url' => $url,
             ]);
+        } catch (ValidationException $e) {
+            Log::error('Failed to update donasi: ' . $e->getMessage());
+
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Failed to update donasi',
+                'errors' => $e->errors()
+            ], 422);
         } catch (\Exception $e) {
             return response()->json([
                 'status' => 'error',

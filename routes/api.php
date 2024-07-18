@@ -37,9 +37,10 @@ Route::post('login', [AuthController::class, 'login']);
 
 Route::post('logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
 
-    Route::get('dashboard', [DashboardController::class, 'index']);
 
 Route::prefix('admin/')->middleware('auth:sanctum')->group( function (){
+
+    Route::get('dashboard', [DashboardController::class, 'index']);
 
     //manajemen program
     Route::get('manajemen/program', [ProgramController::class, 'index']);
@@ -118,8 +119,7 @@ Route::prefix('admin/')->middleware('auth:sanctum')->group( function (){
 });
     Route::get('admin/manajemen/kontenprogram', [KontenProgramController::class, 'index']);
 
-
-Route::prefix('admin/')->middleware('auth:sanctum')->group( function (){
+Route::prefix('admin/')->middleware('auth:sanctum')->middleware('auth:sanctum')->group( function (){
     //manajemen Konten Penyaluran
     Route::get('manajemen/kontenpenyaluran', [KontenPenyaluranController::class, 'index']);
     Route::post('manajemen/kontenpenyaluran', [KontenPenyaluranController::class, 'store']);
@@ -132,6 +132,8 @@ Route::prefix('admin/')->middleware('auth:sanctum')->group( function (){
 
 //Controller User
 Route::prefix('user/')->middleware('auth:sanctum')->group( function (){
+
+    Route::get('dashboard', [DashboardController::class, 'index']);
     //manajemen data donasi
     Route::get('manajemen/formdonasi/{id_user}', [FormDonasiController::class, 'index']);
     Route::post('manajemen/formdonasi', [FormdonasiController::class, 'store']);

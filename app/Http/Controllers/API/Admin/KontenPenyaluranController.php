@@ -5,8 +5,10 @@ namespace App\Http\Controllers\API\Admin;
 use Exception;
 use Illuminate\Http\Request;
 use App\Models\KontenPenyaluran;
+use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\File;
+use Illuminate\Validation\ValidationException;
 
 class KontenPenyaluranController extends Controller
 {
@@ -17,7 +19,7 @@ class KontenPenyaluranController extends Controller
             $url = '/admin/kontenpenyaluran';
 
             return response()->json([
-                'status' => 'succes',
+                'status' => 'success',
                 'message' => 'Get data konten penyaluran successfull',
                 'kontenpenyaluran' => $kontenpenyalurans,
                 'url' => $url,
@@ -57,6 +59,14 @@ class KontenPenyaluranController extends Controller
                 'kontenpenyaluran' => $kontenpenyalurans,
                 'url' => $url,
             ]);
+        } catch (ValidationException $e) {
+            Log::error('ed to add konten penyaluran: ' . $e->getMessage());
+
+            return response()->json([
+                'status' => 'error',
+                'message' => 'ed to add konten penyaluran',
+                'errors' => $e->errors()
+            ], 422);
         } catch (\Exception $e) {
             return response()->json([
                 'status' => 'error',
@@ -116,14 +126,21 @@ class KontenPenyaluranController extends Controller
 
             return response()->json([
                 'status' => 'success',
-                'message' => 'Update konten penyaluran seccesfull',
+                'message' => 'Update konten penyaluran successful',
                 'kontenpenyaluran' => $kontenpenyalurans,
                 'url' => $url,
             ]);
+        } catch (ValidationException $e) {
+            Log::error('Failed to update konten penyaluran: ' . $e->getMessage());
+            return response()->json([
+                'status' => 'error', 
+                'message' => 'Failed to update konten penyaluran', 
+                'errors' => $e->errors(),
+            ], 422);
         } catch (\Exception $e) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'Failed to update kontenpenyaluran',
+                'message' => 'Failed to update konten penyaluran',
                 'error' => $e->getMessage()
             ], 500);
         }

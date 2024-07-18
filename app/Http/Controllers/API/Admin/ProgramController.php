@@ -19,7 +19,7 @@ class ProgramController extends Controller
 
             return response()->json([
                 'status' => 'succes',
-                'message' => 'Get data program successfull',
+                'message' => 'Get data program successful',
                 'program' => $programs,
             ]);
         } catch (Exception $e) {
@@ -61,15 +61,15 @@ class ProgramController extends Controller
             ]);
         }
         catch (ValidationException $e) {
-            Log::error('Validation error: ' . $e->getMessage());
+            Log::error('ed to add program: ' . $e->getMessage());
 
             return response()->json([
                 'status' => 'error',
-                'message' => 'Validation error',
+                'message' => 'ed to add program',
                 'errors' => $e->errors()
             ], 422);
         }catch (\Exception $e) {
-            Log::error('Failed to add program: ' . $e->getMessage());
+            Log::error('Failed to add program data: ' . $e->getMessage());
 
             return response()->json([
                 'status' => 'error',
@@ -134,8 +134,15 @@ class ProgramController extends Controller
                 'program' => $programs,
                 'url' => $url,
             ]);
-        } catch (\Exception $e) {
+        } catch (ValidationException $e) {
             Log::error('Failed to update program: ' . $e->getMessage());
+            return response()->json([
+                'status' => 'error', 
+                'message' => 'Failed to update program', 
+                'errors' => $e->errors(),
+            ], 422);
+        } catch (\Exception $e) {
+            Log::error('Failed to etrieve program data: ' . $e->getMessage());
 
             return response()->json([
                 'status' => 'error',
@@ -155,7 +162,7 @@ class ProgramController extends Controller
             }
 
             $programs->delete();
-            $url = '/admin/program';
+            $url = '/admin/program/delete';
 
             return response()->json([
                 'status' => 'success',

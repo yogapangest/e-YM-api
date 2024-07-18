@@ -66,8 +66,8 @@ Route::prefix('admin/')->middleware('auth:sanctum')->group( function (){
     Route::put('manajemen/distribusi-barang/update/{id}', [DistribusiBarangController::class, 'update']);
     Route::delete('manajemen/distribusi-barang/delete/{id}', [DistribusiBarangController::class, 'destroy']);
     //manajemen distribusi cetak pdf
-    Route::get('cetakpdf/{distribusis_id}', [CetakPdfController::class, 'cetakPDF2']);
-    Route::get('/cetak/{distribusis_id}', [DistribusiBarangController::class, 'cetakPDF']);
+    // Route::get('cetakpdf/{distribusis_id}', [CetakPdfController::class, 'cetakPDF2']);
+    // Route::get('/cetak/{distribusis_id}', [DistribusiBarangController::class, 'cetakPDF']);
 
 });
 
@@ -116,8 +116,10 @@ Route::prefix('admin/')->middleware('auth:sanctum')->group( function (){
     Route::put('manajemen/kontenprogram/update/{id}', [KontenProgramController::class, 'update']);
     Route::delete('manajemen/kontenprogram/delete/{id}', [KontenProgramController::class, 'destroy']);
 });
+    Route::get('admin/manajemen/kontenprogram', [KontenProgramController::class, 'index']);
 
-Route::prefix('admin/')->group( function (){
+
+Route::prefix('admin/')->middleware('auth:sanctum')->group( function (){
     //manajemen Konten Penyaluran
     Route::get('manajemen/kontenpenyaluran', [KontenPenyaluranController::class, 'index']);
     Route::post('manajemen/kontenpenyaluran', [KontenPenyaluranController::class, 'store']);
@@ -125,6 +127,7 @@ Route::prefix('admin/')->group( function (){
     Route::put('manajemen/kontenpenyaluran/update/{id}', [KontenPenyaluranController::class, 'update']);
     Route::delete('manajemen/kontenpenyaluran/delete/{id}', [KontenPenyaluranController::class, 'destroy']);
 });
+    Route::get('admin/manajemen/kontenpenyaluran', [KontenPenyaluranController::class, 'index']);
 
 
 //Controller User

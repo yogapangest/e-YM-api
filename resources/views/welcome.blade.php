@@ -105,40 +105,24 @@
                 <h2>Penyaluran Bantuan Yatim Mandiri Cabang Banyuwangi</h2>
             </div>
 
-            @if ($KontenPenyaluran->count() > 0)
-                <div class="scrollable-content">
-                    <div class="grid-container">
-                        @foreach ($KontenPenyaluran as $data)
-                            <div class="grid-item" data-aos="zoom-in" data-aos-delay="200" onclick="showDetail(this)">
-                                <div class="icon-box rounded-4">
-                                    <div class="icon">
-                                        <img src="{{ asset('storage/' . $data->foto) }}" alt="Foto"
-                                            class="img-thumbnail" width="500">
-                                    </div>
-                                    <h2 class="nama">{{ $data->nama }}</h2>
-                                    <p class="partial-description">{{ substr($data->keterangan, 0, 0) }}</p>
-                                    <p class="full-description" style="display:none;">{{ $data->keterangan }}</p>
-                                    <div class="read-more-btn-container">
-                                        <button class="read-more-btn">Berita Selengkapnya</button>
-                                    </div>
-                                </div>
-                            </div>
-                        @endforeach
-                    </div>
+            <div class="scrollable-content">
+                <div class="grid-container" id="konten-penyaluran-container">
+                    <!-- Konten penyaluran akan dimuat di sini oleh JavaScript -->
                 </div>
-            @else
-                <div class="text-center" style="color:#ffffff;">Konten Penyaluran Belum Diisi</div>
-            @endif
+            </div>
+            <div class="text-center" style="color: #000000;" id="empty-message" style="display: none;">Konten Penyaluran
+                Belum Diisi</div>
 
             <div id="detail-view" class="detail-view" onclick="hideDetail()">
                 <div class="detail-content" onclick="event.stopPropagation()">
                     <span class="close-btn" onclick="hideDetail()">&times;</span>
                     <img id="detail-image" src="" alt="Detail Foto" class="img-thumbnail mb-3"
-                        width="100%">
+                        width="300">
                     <h2 id="detail-title"></h2>
-                    <p id="detail-description" class="full-description"></p>
+                    <p id="detail-description"></p>
                 </div>
             </div>
+
         </div>
     </section>
     <!-- End Services Section -->
@@ -147,27 +131,13 @@
     <section id="program" class="program section-bg" style="background-color: #ffffff">
         <div class="container" data-aos="fade-up">
 
-            <div class="section-title">
-                <h2>Program Yatim Mandiri</h2>
+            <div class="grid-container" id="konten-program-container">
+                <!-- Konten program akan dimuat di sini oleh JavaScript -->
+            </div>
+            <div class="text-center" id="empty-message" style="color: rgb(0, 0, 0); display: none;">
+                Konten Program Belum Diisi
             </div>
 
-            @if ($KontenProgram->count() > 0)
-                <div class="grid-container">
-                    @foreach ($KontenProgram as $data)
-                        <div class="grid-item single-item" data-aos="zoom-in" data-aos-delay="200">
-                            <div class="icon-box rounded-4">
-                                <div class="icon">
-                                    <img src="{{ asset('storage/' . $data->foto) }}" alt="Foto"
-                                        class="img-thumbnail" width="500">
-                                </div>
-                                <h2>{{ $data->nama }}</h2>
-                            </div>
-                        </div>
-                    @endforeach
-                </div>
-            @else
-                <div class="text-center" style="color: rgb(0, 0, 0);">Konten Program Belum Diisi</div>
-            @endif
 
         </div>
     </section><!-- End About Us Section -->
@@ -344,48 +314,140 @@
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-
+    <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4="
+        crossorigin="anonymous"></script>
 
     <script>
-        function showDetail(element) {
-            var detailView = document.getElementById('detail-view');
-            var detailImage = document.getElementById('detail-image');
-            var detailTitle = document.getElementById('detail-title');
-            var detailDescription = document.getElementById('detail-description');
+        // konten program
+        $(document).ready(function() {
+            $.ajax({
+                url: '/api/admin/manajemen/kontenprogram',
+                method: 'GET',
+                success: function(data) {
+                    var container = $('#konten-program-container');
+                    var emptyMessage = $('#empty-message');
 
-            detailImage.src = element.querySelector('img').src;
-            detailTitle.innerText = element.querySelector('h2').innerText;
-            detailDescription.innerText = element.querySelector('.full-description').innerText;
+                    if (Array.isArray(data.kontenprogram) && data.kontenprogram.length > 0) {
+                        emptyMessage.hide(); // Sembunyikan pesan jika ada data
 
-            // Hapus kelas partial-description agar keterangan ditampilkan penuh
-            detailDescription.classList.remove('partial-description');
-            detailDescription.classList.add('full-description');
+                        data.kontenprogram.forEach(function(konten_program, index) {
+                            var gridItem = $(
+                                '<div class="grid-item single-item" data-aos="zoom-in" data-aos-delay="200"></div>'
+                            );
+                            var iconBox = $('<div class="icon-box rounded-4"></div>');
+                            var icon = $('<div class="icon"></div>');
+                            var imagePath = '/file/kontenprogram/' + konten_program.foto;
 
-            detailView.classList.add('active');
-            document.body.classList.add('no-scroll');
-        }
+                            icon.append('<img src="' + imagePath +
+                                '" alt="Foto" class="img-thumbnail" width="500">');
+                            iconBox.append(icon);
+                            iconBox.append('<h2>' + konten_program.nama_kontenprogram +
+                                '</h2>');
+                            gridItem.append(iconBox);
+                            container.append(gridItem);
+                        });
+
+                        if (data.kontenprogram.length > 4) {
+                            container.css('overflow', 'hidden');
+                            var totalWidth = container[0].scrollWidth;
+
+                            setInterval(function() {
+                                container.animate({
+                                    scrollLeft: totalWidth
+                                }, 5000, function() {
+                                    container.scrollLeft(0);
+                                });
+                            }, 5000);
+                        }
+                    } else {
+                        emptyMessage.show(); // Tampilkan pesan jika tidak ada data
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('There has been a problem with your AJAX operation:', error);
+                    $('#empty-message').show(); // Tampilkan pesan jika terjadi error
+                }
+            });
+        });
+    </script>
+
+    <script>
+        // konten penyaluran
+        $(document).ready(function() {
+            $.ajax({
+                url: '/api/admin/manajemen/kontenpenyaluran',
+                method: 'GET',
+                success: function(data) {
+                    if (Array.isArray(data.kontenpenyaluran) && data.kontenpenyaluran.length > 0) {
+                        var container = $('#konten-penyaluran-container');
+                        var emptyMessage = $('#empty-message');
+                        emptyMessage.hide();
+
+                        data.kontenpenyaluran.forEach(function(konten_penyaluran) {
+                            var gridItem = $(
+                                '<div class="grid-item" data-aos="zoom-in" data-aos-delay="200"></div>'
+                            );
+                            var iconBox = $('<div class="icon-box rounded-4"></div>');
+                            var icon = $('<div class="icon"></div>');
+                            var imagePath = '/file/kontenpenyaluran/' + konten_penyaluran.foto;
+
+                            icon.append('<img src="' + imagePath +
+                                '" alt="Foto" class="img-thumbnail" width="300">');
+                            iconBox.append(icon);
+                            iconBox.append('<h2 class="nama_penyaluran">' + konten_penyaluran
+                                .nama_penyaluran + '</h2>');
+                            iconBox.append(
+                                '<p class="full-description" style="display: none;">' +
+                                konten_penyaluran.deskripsi + '</p>');
+                            iconBox.append(
+                                '<div class="read-more-btn-container"><button class="read-more-btn">Berita Selengkapnya</button></div>'
+                            );
+                            gridItem.append(iconBox);
+                            container.append(gridItem);
+                        });
+
+                        // Hitung total lebar konten di dalam container
+                        var totalWidth = container[0].scrollWidth;
+
+                        // Cek apakah perlu melakukan animasi
+                        if (totalWidth > container.width()) {
+                            setInterval(function() {
+                                var currentScrollLeft = container.scrollLeft();
+                                container.animate({
+                                    scrollLeft: currentScrollLeft +
+                                        300 // Menggerakkan sebesar 300 piksel ke kanan
+                                }, 2000); // Durasi animasi 2 detik
+                            }, 3000); // Interval setiap 3 detik
+                        }
+                    } else {
+                        $('#empty-message').show();
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('There has been a problem with your AJAX operation:', error);
+                    $('#empty-message').show();
+                }
+            });
+        });
+
+        $(document).on('click', '.read-more-btn', function(event) {
+            event.stopPropagation();
+            var gridItem = $(this).closest('.grid-item');
+            var imagePath = gridItem.find('.icon img').attr('src');
+            var title = gridItem.find('.nama_penyaluran').text();
+            var description = gridItem.find('.full-description').text();
+
+            $('#detail-image').attr('src', imagePath);
+            $('#detail-title').text(title);
+            $('#detail-description').text(description);
+
+            $('#detail-view').show();
+        });
 
         function hideDetail() {
-            var detailView = document.getElementById('detail-view');
-            detailView.classList.remove('active');
-            document.body.classList.remove('no-scroll');
+            $('#detail-view').hide();
         }
     </script>
-    <script>
-        function scrollToLeft() {
-            var container = document.querySelector('.grid-container');
-            container.scrollLeft -= 100; // Ubah nilai sesuai kebutuhan
-        }
-
-        function scrollToRight() {
-            var container = document.querySelector('.grid-container');
-            container.scrollLeft += 100; // Ubah nilai sesuai kebutuhan
-        }
-    </script>
-
-
-
-
 
 </body>
 

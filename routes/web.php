@@ -40,7 +40,19 @@ Route::middleware('guest')->group( function() {
 
 Route::get('/',[HomeController::class, 'index'])->name('home');
 
+// Route::get('/admin/manajemen/distribusi-barang/cetak/data/baru/{distribusis_id}', function(){
+//     dd('tes');
+//     return view('page.distribusi_barang.cetak_data');
+// });
+
+Route::get('/admin/manajemen/distribusi-barang/cetak/{distribusis_id}', function(){
+    return view('page.distribusi_barang.cetak_data');
+});
+
+
+
 Route::prefix('apps')->middleware(['auth:sanctum', 'CheckRole:Admin;User'])->group( function() {
+
     Route::get('dashboard',function(){
         return view('administrator.dashboard');
     })->name('apps.dashboard');
@@ -81,15 +93,15 @@ Route::prefix('apps')->middleware(['auth:sanctum', 'CheckRole:Admin;User'])->gro
     })->name('index.edit.program');
 
     //manajemen arsip
-    Route::get('/arsip/view', function(){
-        return view('page.manajemen_arsip.index');
-    })->name('index.view');
-    Route::get('/arsip/create',function(){
-        return view('page.manajemen_arsip.create');
-    })->name('index.create');
-    Route::get('/arsip/{id_jenisArsip}/edit',function(){
-        return view('page.manajemen_arsip.edit');
-    })->name('index.edit');
+    // Route::get('/arsip/view', function(){
+    //     return view('page.manajemen_arsip.index');
+    // })->name('index.view');
+    // Route::get('/arsip/create',function(){
+    //     return view('page.manajemen_arsip.create');
+    // })->name('index.create');
+    // Route::get('/arsip/{id_jenisArsip}/edit',function(){
+    //     return view('page.manajemen_arsip.edit');
+    // })->name('index.edit');
 
     //manajemen jenis arsip
     Route::get('/jenis-arsip/view', function(){
@@ -169,12 +181,6 @@ Route::prefix('apps')->middleware(['auth:sanctum', 'CheckRole:Admin;User'])->gro
         return view('page.manajemen_profile.index');
     })->name('index.view.profile');
     Route::put('/ubah-profile/{id_user}/update',[ProfileController::class, 'update'])->name('index.update.profile');
-
-    //cetak lpj
-    Route::get('/cetak/{distribusi_id}', function(){
-        return view('page.distribusi_barang.cetak_data');
-    })->name('cetak.pdf');
-    Route::get('/download-laporan/{distribusiId}', 'DistribusiBarangController@download')->name('download.laporan');
 
 
     //konten penyaluran

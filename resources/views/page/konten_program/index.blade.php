@@ -81,7 +81,9 @@
 
                             var imagePath = '/file/kontenprogram/' + konten_program.foto;
                             console.log(imagePath);
-                            row.append('<td><img src="' + imagePath +
+                            row.append(
+                                '<td><img src="' +
+                                imagePath +
                                 '" style="width: 70px; height: auto; border-radius: 0;"></td>'
                             );
 

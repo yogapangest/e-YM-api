@@ -87,7 +87,7 @@ class AuthController extends Controller
             $user->tokens()->delete();
         }
 
-        $url = '/auth';
+        $url = '/';
 
         return response()->json([
             'status' => 'success',

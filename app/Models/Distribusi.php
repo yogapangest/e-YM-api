@@ -27,6 +27,6 @@ class Distribusi extends Model
 
     public function distribusibarang()
     {
-        return $this->hasMany(DistribusiBarang::class,);
+        return $this->hasMany(DistribusiBarang::class, 'distribusis_id', 'id');
     }
 }

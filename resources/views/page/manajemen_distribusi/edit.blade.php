@@ -57,11 +57,11 @@
                                     <input type="hidden" id="anggaran" name="anggaran">
                                 </div>
 
-                                <div class="form-group">
+                                {{-- <div class="form-group">
                                     <label for="pengeluaran_display">Pengeluaran</label>
                                     <input type="text" id="pengeluaran_display" class="form-control">
                                     <input type="hidden" id="pengeluaran" name="pengeluaran">
-                                </div>
+                                </div> --}}
                                 <div class="form-group">
                                     <label for="file" class="form-label">File</label>
                                     <input type="file" class="form-control @error('file') is-invalid @enderror"
@@ -106,7 +106,7 @@
                         $('#anggaran_display').val(formatRupiah(data.distribusi.anggaran));
                         $('#anggaran').val(data.distribusi.anggaran);
 
-                        $('#pengeluaran_display').val(formatRupiah(data.distribusi.pengeluaran));
+                        // $('#pengeluaran_display').val(formatRupiah(data.distribusi.pengeluaran));
                         $('#pengeluaran').val(data.distribusi.pengeluaran);
                         $('#file').val(data.distribusi.file);
 
@@ -134,11 +134,11 @@
                 $(this).val(formatRupiah(rawValue));
             });
 
-            $('#pengeluaran_display').on('input', function() {
-                var rawValue = parseRupiah($(this).val());
-                $('#pengeluaran').val(rawValue);
-                $(this).val(formatRupiah(rawValue));
-            });
+            // $('#pengeluaran_display').on('input', function() {
+            //     var rawValue = parseRupiah($(this).val());
+            //     $('#pengeluaran').val(rawValue);
+            //     $(this).val(formatRupiah(rawValue));
+            // });
 
             // Load Program Data
             $.ajax({

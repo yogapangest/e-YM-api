@@ -110,7 +110,7 @@
                                 if (['jpg', 'jpeg', 'png', 'gif'].includes(fileExtension)) {
                                     // Jika file gambar, buat elemen img
                                     row.append('<td><img src="' + '/file/donasi/' + fileUrl +
-                                        '" alt="' + program.file +
+                                        '" alt="' + donasi.file +
                                         '" style="width: 70px; height: auto; border-radius: 0;"></td>'
                                     );
                                 } else if (fileExtension === 'pdf') {

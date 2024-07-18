@@ -71,7 +71,7 @@
                                     @enderror
                                 </div>
 
-                                <div class="form-group">
+                                {{-- <div class="form-group">
                                     <label for="pengeluaran">Pengeluaran</label>
                                     <input id="pengeluaran_display" type="text"
                                         class="form-control @error('pengeluaran') is-invalid @enderror"
@@ -82,7 +82,7 @@
                                     @error('pengeluaran')
                                         <div id="pengeluaran_error" class="form-text">{{ $message }}</div>
                                     @enderror
-                                </div>
+                                </div> --}}
 
                                 <div class="form-group">
                                     <label for="file" class="form-label">file</label>
@@ -124,7 +124,7 @@
                             '<option value="" selected disabled>Pilih Program</option>');
                         data.program.forEach(function(program) {
                             programDropdown.append(new Option(program.nama_program, program
-                            .id));
+                                .id));
                         });
                     }
                 },

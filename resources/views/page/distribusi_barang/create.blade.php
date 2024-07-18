@@ -112,6 +112,24 @@
                 formData.append('satuan', $('#satuan').val());
                 formData.append('harga_satuan', $('#harga_satuan').val());
 
+                // Hitung total jumlah yang akan ditambahkan
+                var totalJumlahBaru = parseInt($('#jumlah').val());
+                var totalJumlahSaatIni = 0;
+
+                // Iterasi data yang ada di tabel distribusi untuk menghitung total jumlah saat ini
+                $('.table-striped tbody tr').each(function(index, tr) {
+                    var jumlah = parseInt($(tr).find('td:nth-child(6)').text().replace(/\D/g, ''));
+                    totalJumlahSaatIni += jumlah;
+                });
+
+                // Bandingkan dengan pengeluaran yang ada
+                var pengeluaran = distribusiId;
+
+                if ((totalJumlahSaatIni + totalJumlahBaru) > pengeluaran) {
+                    alert('Jumlah total melebihi pengeluaran yang ada pada distribusi ini.');
+                    return;
+                }
+
                 $.ajax({
                     url: '/api/admin/manajemen/distribusi-barang/',
                     method: 'POST',
@@ -125,8 +143,14 @@
                         window.location.href = '/apps/distribusi_barang/view/' + distribusiId;
                     },
                     error: function(xhr, status, error) {
-                        console.error('There has been a problem with your AJAX operation:',
-                            error);
+                        // Tangkap pesan error dari respons JSON
+                        var response = xhr.responseJSON;
+                        if (response && response.status === 'error') {
+                            alert(response.message);
+                        } else {
+                            console.error('There has been a problem with your AJAX operation:',
+                                error);
+                        }
                     }
                 });
             });

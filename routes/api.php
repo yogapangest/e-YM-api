@@ -5,10 +5,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\Auth\AuthController;
 use App\Http\Controllers\API\Admin\ArsipController;
 use App\Http\Controllers\API\Admin\ProgramController;
-use App\Http\Controllers\API\Admin\CetakPdfController;
 use App\Http\Controllers\API\Admin\DashboardController;
 use App\Http\Controllers\API\User\FormDonasiController;
-use App\Http\Controllers\API\Admin\DataBarangController;
 use App\Http\Controllers\API\Admin\DataDonasiController;
 use App\Http\Controllers\API\Admin\DistribusiController;
 use App\Http\Controllers\API\Admin\JenisArsipController;
@@ -65,10 +63,6 @@ Route::prefix('admin/')->middleware('auth:sanctum')->group( function (){
     Route::get('manajemen/distribusi-barang/edit/{id}', [DistribusiBarangController::class, 'edit']);
     Route::put('manajemen/distribusi-barang/update/{id}', [DistribusiBarangController::class, 'update']);
     Route::delete('manajemen/distribusi-barang/delete/{id}', [DistribusiBarangController::class, 'destroy']);
-    //manajemen distribusi cetak pdf
-    // Route::get('cetakpdf/{distribusis_id}', [CetakPdfController::class, 'cetakPDF2']);
-    // Route::get('/cetak/{distribusis_id}', [DistribusiBarangController::class, 'cetakPDF']);
-
 });
 
 
@@ -144,17 +138,4 @@ Route::prefix('user/')->middleware('auth:sanctum')->group(function (){
     //update Profile
     Route::get('update-profile/edit', [UpdateProfileController::class, 'edit']);
     Route::put('update-profile/update', [UpdateProfileController::class, 'update']);
-});
-
-
-
-
-/////////////////////////pending//////////////////////////////
-Route::prefix('admin/')->middleware('auth:sanctum')->group( function (){
-    //manajemen data barang
-    Route::get('manajemen/databarang', [DataBarangController::class, 'index']);
-    Route::post('manajemen/databarang', [DataBarangController::class, 'store']);
-    Route::get('manajemen/databarang/edit/{id}', [DataBarangController::class, 'edit']);
-    Route::put('manajemen/databarang/update/{id}', [DataBarangController::class, 'update']);
-    Route::delete('manajemen/databarang/delete/{id}', [DataBarangController::class, 'destroy']);
 });

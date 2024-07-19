@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API\Admin;
 use Exception;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
@@ -19,7 +20,7 @@ class DataDonasiController extends Controller
             $url = '/admin/user';
 
             return response()->json([
-                'status' => 'success',
+                'status' => 'succes',
                 'message' => 'Get data user successfull',
                 'user' => $users,
                 'url' => $url,
@@ -73,7 +74,7 @@ class DataDonasiController extends Controller
             'success' => true,
             'message' => 'Create Berhasil',
             'data' => $success
-        ], 201);
+        ]);
     }
 
     public function edit($id)

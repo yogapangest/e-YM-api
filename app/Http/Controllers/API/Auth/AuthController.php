@@ -23,7 +23,7 @@ class AuthController extends Controller
             'confirm_password' => 'required|same:password'
         ]);
 
-        $user = User::create([
+        User::create([
             'name' => $validatedData['name'],
             'email' => $validatedData['email'],
             'username' => $validatedData['username'],
@@ -34,21 +34,14 @@ class AuthController extends Controller
             'role' => 'User',
         ]);
 
-        $token = $user->createToken('User')->plainTextToken;
-        
-        $cookieName = 'access_token';
-        $cookieLifetime = 60 * 24;
+        $loginRequest = new Request([
+            'email' => $validatedData['email'],
+            'password' => $validatedData['password'],
+        ]);
 
-        $cookie = cookie($cookieName, $token, $cookieLifetime);
+        // Memanggil metode login menggunakan objek request
+        return $this->login($loginRequest);
 
-        $url = '/apps/dashboard';
-
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Registration successful',
-            'token' => $token,
-            'url' => $url
-        ])->withCookie($cookie);
     }
 
      public function login(Request $request)
@@ -94,7 +87,7 @@ class AuthController extends Controller
             $user->tokens()->delete();
         }
 
-        $url = '/auth';
+        $url = '/';
 
         return response()->json([
             'status' => 'success',

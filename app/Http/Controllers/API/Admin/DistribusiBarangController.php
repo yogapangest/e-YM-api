@@ -2,16 +2,14 @@
 
 namespace App\Http\Controllers\API\Admin;
 
-use TCPDF;
 use Exception;
-use Carbon\Carbon;
 use App\Models\Distribusi;
 use Illuminate\Http\Request;
 use App\Models\DistribusiBarang;
-use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\File;
-use Illuminate\Validation\ValidationException;
+use Carbon\Carbon;
+use TCPDF;
 
 class DistribusiBarangController extends Controller
 {
@@ -21,18 +19,19 @@ class DistribusiBarangController extends Controller
         try {
             $distribusi = Distribusi::findOrFail($distribusis_id);
             $distribusibarangs = DistribusiBarang::where('distribusis_id', $distribusis_id)->get();
+            $program = $distribusi->program->first();
             $url = '/admin/distribusibarangs';
+
 
             return response()->json([
                 'status' => 'success',
                 'message' => 'Get data distribusi barang successful',
                 'distribusi' => $distribusi,
                 'distribusibarangs' => $distribusibarangs,
+                'program' => $program,
                 'url' => $url,
             ]);
         } catch (Exception $e) {
-            Log::error('Failed to get distribusi barang: ' . $e->getMessage());
-
             return response()->json([
                 'status' => 'error',
                 'message' => 'Failed to get distribusi barang',
@@ -68,6 +67,7 @@ class DistribusiBarangController extends Controller
 
             // Periksa apakah total jumlah melebihi anggaran
             $totalJumlahDistribusiBarang = DistribusiBarang::where('distribusis_id', $validatedData['distribusis_id'])->sum('jumlah');
+
             if ($totalJumlahDistribusiBarang + $jumlah > $anggaran) {
                 return response()->json([
                     'status' => 'error',
@@ -77,6 +77,11 @@ class DistribusiBarangController extends Controller
 
             // Simpan data distribusi barang ke database
             $distribusibarangs = DistribusiBarang::create($validatedData);
+            $distribusi->update([
+                'pengeluaran' => $totalJumlahDistribusiBarang + $jumlah,
+                'sisa' => $anggaran -  $totalJumlahDistribusiBarang - $jumlah,
+            ]);
+
             $url = '/admin/distribusibarangs';
 
             return response()->json([
@@ -85,14 +90,6 @@ class DistribusiBarangController extends Controller
                 'distribusibarangs' => $distribusibarangs,
                 'url' => $url,
             ]);
-        } catch (ValidationException $e) {
-            Log::error('Validation error: ' . $e->getMessage());
-
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Validation error',
-                'errors' => $e->errors(),
-            ], 422);
         } catch (\Exception $e) {
             return response()->json([
                 'status' => 'error',
@@ -174,14 +171,6 @@ class DistribusiBarangController extends Controller
             'distribusibarang' => $distribusiBarang,
             'url' => $url,
         ]);
-    } catch (ValidationException $e) {
-        Log::error('Validation error: ' . $e->getMessage());
-
-        return response()->json([
-            'status' => 'error',
-            'message' => 'Validation error',
-            'errors' => $e->errors(),
-        ], 422);
     } catch (\Exception $e) {
         return response()->json([
             'status' => 'error',
@@ -205,13 +194,8 @@ class DistribusiBarangController extends Controller
             $url = '/admin/distribusibarangs';
 
             return response()->json([
-<<<<<<< HEAD
                 'status' => 'success',
-                'message' => 'Distribusi barang has been removed',
-=======
-                'status' => 'seccess',
                 'message' => 'distribusi barang has been removed',
->>>>>>> parent of b7f5696 (finishing integrasi)
                 'url' => $url,
             ]);
         } catch (\Exception $e) {
@@ -223,55 +207,55 @@ class DistribusiBarangController extends Controller
         }
     }
 
-    public function cetakPDF($distribusis_id)
-{
-    try {
-        // Mengambil data distribusi barang berdasarkan ID distribusi
-        $distribusi_barang = DistribusiBarang::where('distribusis_id', $distribusis_id)->get();
-        if ($distribusi_barang->isEmpty()) {
-            return response()->json(['message' => 'Distribusi barang tidak ditemukan'], 404);
-        }
+//     public function cetakPDF($distribusis_id)
+// {
+//     try {
+//         // Mengambil data distribusi barang berdasarkan ID distribusi
+//         $distribusi_barang = DistribusiBarang::where('distribusis_id', $distribusis_id)->get();
+//         if ($distribusi_barang->isEmpty()) {
+//             return response()->json(['message' => 'Distribusi barang tidak ditemukan'], 404);
+//         }
 
-        // Mengambil data distribusi berdasarkan ID
-        $distribusi = Distribusi::find($distribusis_id);
-        if (!$distribusi) {
-            return response()->json(['message' => 'Distribusi tidak ditemukan'], 404);
-        }
+//         // Mengambil data distribusi berdasarkan ID
+//         $distribusi = Distribusi::find($distribusis_id);
+//         if (!$distribusi) {
+//             return response()->json(['message' => 'Distribusi tidak ditemukan'], 404);
+//         }
 
-        // Mengakses relasi program dari distribusi
-        $program = $distribusi->program;
-        $tanggal = Carbon::now()->translatedFormat('d F Y');
-        $namaProgram = $program->nama;
+//         // Mengakses relasi program dari distribusi
+//         $program = $distribusi->program;
+//         $tanggal = Carbon::now()->translatedFormat('d F Y');
+//         $namaProgram = $program->nama;
 
-        // Menginisialisasi TCPDF
-        $pdf = new TCPDF('P', 'mm', 'A4', true, 'UTF-8', false);
-        $pdf->SetCreator('Creator');
-        $pdf->SetAuthor('Author');
-        $pdf->SetTitle($namaProgram . ' - ' . $tanggal);
-        $pdf->setPrintHeader(false);
+//         // Menginisialisasi TCPDF
+//         $pdf = new TCPDF('P', 'mm', 'A4', true, 'UTF-8', false);
+//         $pdf->SetCreator('Creator');
+//         $pdf->SetAuthor('Author');
+//         $pdf->SetTitle($namaProgram . ' - ' . $tanggal);
+//         $pdf->setPrintHeader(false);
 
-        // Menambahkan halaman baru dan mengatur font
-        $pdf->AddPage();
-        $pdf->SetFont('Helvetica', '', 12);
+//         // Menambahkan halaman baru dan mengatur font
+//         $pdf->AddPage();
+//         $pdf->SetFont('Helvetica', '', 12);
 
-        // Mengambil view dan mengubah path gambar ke path absolut
-        $html = view('page.distribusi_barang.cetak_data', compact('distribusi_barang'))->render();
-        $html = str_replace('src="{{ asset(', 'src="' . public_path(), $html);
+//         // Mengambil view dan mengubah path gambar ke path absolut
+//         $html = view('page.distribusi_barang.cetak_data', compact('distribusi_barang'))->render();
+//         $html = str_replace('src="{{ asset(', 'src="' . public_path(), $html);
 
-        // Menulis HTML ke dalam PDF
-        $pdf->writeHTML($html, true, false, true, false, '');
+//         // Menulis HTML ke dalam PDF
+//         $pdf->writeHTML($html, true, false, true, false, '');
 
-        // Menyimpan PDF ke dalam variabel $pdfContent
-        $pdfContent = $pdf->Output($namaProgram.'-'.$tanggal, 'S'); // 'S' untuk mengembalikan PDF sebagai string
+//         // Menyimpan PDF ke dalam variabel $pdfContent
+//         $pdfContent = $pdf->Output($namaProgram.'-'.$tanggal, 'S'); // 'S' untuk mengembalikan PDF sebagai string
 
-        // Mengirimkan PDF sebagai respons untuk diunduh
-        return response($pdfContent)
-            ->header('Content-Type', 'application/pdf')
-            ->header('Content-Disposition', 'attachment; filename="laporan_data_barang.pdf"');
-    } catch (\Exception $e) {
-        return response()->json(['message' => 'Terjadi kesalahan saat menghasilkan PDF', 'error' => $e->getMessage()], 500);
-    }
-}
+//         // Mengirimkan PDF sebagai respons untuk diunduh
+//         return response($pdfContent)
+//             ->header('Content-Type', 'application/pdf')
+//             ->header('Content-Disposition', 'attachment; filename="laporan_data_barang.pdf"');
+//     } catch (\Exception $e) {
+//         return response()->json(['message' => 'Terjadi kesalahan saat menghasilkan PDF', 'error' => $e->getMessage()], 500);
+//     }
+// }
 
 
 

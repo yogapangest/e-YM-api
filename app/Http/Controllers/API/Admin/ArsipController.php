@@ -7,10 +7,8 @@ use App\Models\Arsip;
 use App\Models\Program;
 use App\Models\JenisArsip;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\File;
-use Illuminate\Validation\ValidationException;
 
 class ArsipController extends Controller
 {
@@ -21,8 +19,8 @@ class ArsipController extends Controller
             $url = '/admin/arsip';
 
             return response()->json([
-                'status' => 'success',
-                'message' => 'Get data arsip successful',
+                'status' => 'succes',
+                'message' => 'Get data arsip successfull',
                 'arsip' => $arsips,
                 'url' => $url,
             ]);
@@ -59,18 +57,10 @@ class ArsipController extends Controller
 
             return response()->json([
                 'status' => 'success',
-                'message' => 'Add arsip successful',
+                'message' => 'Add arsip seccessfull',
                 'arsip' => $arsips,
                 'url' => $url,
             ]);
-        } catch (ValidationException $e) {
-            Log::error('ed to add arsip: ' . $e->getMessage());
-
-            return response()->json([
-                'status' => 'error',
-                'message' => 'ed to add arsip',
-                'errors' => $e->errors()
-            ], 422);
         } catch (\Exception $e) {
             return response()->json([
                 'status' => 'error',
@@ -131,17 +121,10 @@ class ArsipController extends Controller
 
             return response()->json([
                 'status' => 'success',
-                'message' => 'Update arsip successful',
+                'message' => 'Update arsip seccesfull',
                 'arsip' => $arsips,
                 'url' => $url,
             ]);
-        } catch (ValidationException $e) {
-            Log::error('Failed to update arsip: ' . $e->getMessage());
-            return response()->json([
-                'status' => 'error', 
-                'message' => 'Failed to update arsip', 
-                'errors' => $e->errors(),
-            ], 422);
         } catch (\Exception $e) {
             return response()->json([
                 'status' => 'error',

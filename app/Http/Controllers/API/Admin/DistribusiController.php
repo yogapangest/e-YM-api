@@ -44,19 +44,18 @@ class DistribusiController extends Controller
                 'tempat' => 'required|string',
                 'penerima_manfaat' => 'required|string',
                 'anggaran' => 'required|string|max:128',
-                // 'pengeluaran' => 'required|string|max:128',
+                'pengeluaran' => 'required|string|max:128',
                 'file' => 'nullable|mimes:jpeg,png,jpg,gif,svg,pdf,doc,docx|max:2048',
                 'programs_id' => 'required|exists:programs,id',
             ]);
 
             // Hitung nilai untuk field "sisa"
             $anggaran = floatval($validatedData['anggaran']);
-            $pengeluaran = 0;
+            $pengeluaran = floatval($validatedData['pengeluaran']);
             $sisa = $anggaran - $pengeluaran;
 
             // Tambahkan nilai "sisa" ke dalam data yang divalidasi
             $validatedData['sisa'] = $sisa;
-            $validatedData['pengeluaran'] = $pengeluaran;
 
             if ($request->hasFile('file')) {
                 $files = $request->file('file');
@@ -127,13 +126,13 @@ class DistribusiController extends Controller
                 'tempat' => 'required|string',
                 'penerima_manfaat' => 'required|string',
                 'anggaran' => 'required|numeric',
-                // 'pengeluaran' => 'required|numeric',
+                'pengeluaran' => 'required|numeric',
                 'file' => 'nullable|mimes:jpeg,png,jpg,gif,svg,pdf,doc,docx|max:2048',
                 'programs_id' => 'required|exists:programs,id',
             ]);
 
             // Hitung nilai untuk field "sisa"
-            $validatedData['sisa'] = $validatedData['anggaran'] - $distribusi->pengeluaran;
+            $validatedData['sisa'] = $validatedData['anggaran'] - $validatedData['pengeluaran'];
 
             if ($request->hasFile('file')) {
                 if ($distribusi->file) {

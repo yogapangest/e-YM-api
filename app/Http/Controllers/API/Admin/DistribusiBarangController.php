@@ -68,7 +68,6 @@ class DistribusiBarangController extends Controller
 
             // Periksa apakah total jumlah melebihi anggaran
             $totalJumlahDistribusiBarang = DistribusiBarang::where('distribusis_id', $validatedData['distribusis_id'])->sum('jumlah');
-
             if ($totalJumlahDistribusiBarang + $jumlah > $anggaran) {
                 return response()->json([
                     'status' => 'error',
@@ -78,11 +77,6 @@ class DistribusiBarangController extends Controller
 
             // Simpan data distribusi barang ke database
             $distribusibarangs = DistribusiBarang::create($validatedData);
-            $distribusi->update([
-                'pengeluaran' => $totalJumlahDistribusiBarang + $jumlah,
-                'sisa' => $anggaran -  $totalJumlahDistribusiBarang - $jumlah,
-            ]);
-
             $url = '/admin/distribusibarangs';
 
             return response()->json([
@@ -211,8 +205,13 @@ class DistribusiBarangController extends Controller
             $url = '/admin/distribusibarangs';
 
             return response()->json([
+<<<<<<< HEAD
                 'status' => 'success',
                 'message' => 'Distribusi barang has been removed',
+=======
+                'status' => 'seccess',
+                'message' => 'distribusi barang has been removed',
+>>>>>>> parent of b7f5696 (finishing integrasi)
                 'url' => $url,
             ]);
         } catch (\Exception $e) {

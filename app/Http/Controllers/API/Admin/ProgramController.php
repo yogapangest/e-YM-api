@@ -159,7 +159,7 @@ class ProgramController extends Controller
 
             return response()->json([
                 'status' => 'success',
-                'message' => 'Program has been removed',
+                'message' => 'Program Berhasil Dihapus',
                 'url' => $url,
             ]);
         } catch (\Exception $e) {

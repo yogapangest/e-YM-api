@@ -40,7 +40,7 @@ document.querySelector("form").addEventListener("submit", function (e) {
 
 // Form validation event listener
 document
-    .getElementById("distribusiForm")
+    .getElementById("DistribusiForm")
     .addEventListener("submit", function (e) {
         let isValid = true;
         let fields = [
@@ -49,7 +49,6 @@ document
             { id: "tempat", message: "Tempat harus diisi" },
             { id: "penerima_manfaat", message: "Penerima Manfaat harus diisi" },
             { id: "anggaran_display", message: "Anggaran harus diisi" },
-            { id: "pengeluaran_display", message: "Pengeluaran harus diisi" },
             { id: "file", message: "File harus diisi" },
         ];
 

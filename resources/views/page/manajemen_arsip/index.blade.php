@@ -20,19 +20,17 @@
                         <div class="card">
                             <div class="card-header">
                                 <h4>Daftar Arsip</h4>
-                                <div class="card-header-form">
-                                    <div class="ml-auto mb-2">
-                                        <a href="{{ route('index.create.arsip') }}" style="float: right;"
-                                            class="btn btn-round btn-primary mb-3">Tambah</a>
-                                    </div>
-                                    <form>
+                                <div class="card-header-form d-flex justify-content-between align-items-center">
+                                    <a href="{{ route('index.create.arsip') }}" style="float: right;"
+                                        class="btn btn-round btn-primary mb-3">Tambah</a>
+                                    {{-- <form class="mb-3">
                                         <div class="input-group">
                                             <input type="text" class="form-control" placeholder="Search">
                                             <div class="input-group-btn">
                                                 <button class="btn btn-primary"><i class="fas fa-search"></i></button>
                                             </div>
                                         </div>
-                                    </form>
+                                    </form> --}}
                                 </div>
                             </div>
                             <div class="card-body p-0">
@@ -71,6 +69,8 @@
     {{-- jQuery --}}
     <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4="
         crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+
 
     {{-- Custom Script --}}
     {{-- Script --}}
@@ -151,28 +151,82 @@
             }
 
             // Fungsi untuk menghapus arsip
+            // function deleteArsip(id_arsip, row) {
+            //     if (confirm('Apa Anda yakin ingin menghapus arsip ini?')) {
+            //         $.ajax({
+            //             url: '/api/admin/manajemen/arsip/delete/' + id_arsip,
+            //             method: 'DELETE',
+            //             headers: {
+            //                 'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            //             },
+            //             success: function(response) {
+            //                 if (response.status === 'success') {
+            //                     alert('Arsip berhasil dihapus');
+            //                     // Hapus baris arsip dari tabel
+            //                     row.remove();
+            //                 } else {
+            //                     alert('Gagal menghapus arsip');
+            //                 }
+            //             },
+            //             error: function(xhr, status, error) {
+            //                 console.error('There has been a problem with your AJAX operation:', error);
+            //             }
+            //         });
+            //     }
+            // }
+
             function deleteArsip(id_arsip, row) {
-                if (confirm('Apa Anda yakin ingin menghapus arsip ini?')) {
-                    $.ajax({
-                        url: '/api/admin/manajemen/arsip/delete/' + id_arsip,
-                        method: 'DELETE',
-                        headers: {
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                        },
-                        success: function(response) {
-                            if (response.status === 'success') {
-                                alert('Arsip berhasil dihapus');
-                                // Hapus baris arsip dari tabel
-                                row.remove();
-                            } else {
-                                alert('Gagal menghapus arsip');
+                Swal.fire({
+                    title: 'Apakah Anda yakin?',
+                    text: 'Anda tidak dapat mengembalikan data yang telah dihapus!',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#6777ef',
+                    confirmButtonText: 'Ya, hapus!',
+                    cancelButtonText: 'Batal'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: '/api/admin/manajemen/arsip/delete/' + id_arsip,
+                            method: 'DELETE',
+                            headers: {
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                            },
+                            success: function(response) {
+                                console.log(response); // Log respons untuk debugging
+                                if (response.status === 'success') {
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: 'Sukses',
+                                        text: response.message,
+                                        confirmButtonColor: '#6777ef',
+                                    }).then(function() {
+                                        window.location.href = '/apps/arsip/view';
+                                    });
+                                } else {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Gagal',
+                                        text: response.message ||
+                                            'Data tidak dapat dihapus',
+                                        confirmButtonColor: '#6777ef',
+                                    });
+                                }
+                            },
+                            error: function(xhr, status, error) {
+                                console.error('Terjadi masalah dengan operasi AJAX Anda:',
+                                    error);
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Gagal',
+                                    text: 'Terjadi kesalahan saat menghapus data',
+                                    confirmButtonColor: '#6777ef',
+                                });
                             }
-                        },
-                        error: function(xhr, status, error) {
-                            console.error('There has been a problem with your AJAX operation:', error);
-                        }
-                    });
-                }
+                        });
+                    }
+                });
             }
         });
     </script>

@@ -148,7 +148,7 @@ class ArsipController extends Controller
 
             return response()->json([
                 'status' => 'success',
-                'message' => 'arsip has been removed',
+                'message' => 'Arsip Berhasil Dihapus',
                 'url' => $url,
             ]);
         } catch (\Exception $e) {

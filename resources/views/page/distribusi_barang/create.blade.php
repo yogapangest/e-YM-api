@@ -11,6 +11,8 @@
                         <div class="card-header">
                             <h4>Tambah Data Barang</h4>
                         </div>
+                        <!-- Peringatan akan muncul di sini -->
+                        <div id="warningMessage" style="display: none;" class="alert alert-danger"></div>
                         <div class="card-body">
                             <form id="DistribusiBarangForm" method="POST" action="#">
                                 @csrf
@@ -98,6 +100,10 @@
     </div>
     <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4="
         crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+    <script src="{{ asset('js/distribusibarang.js') }}"></script>
+
+
     <script>
         $(document).ready(function() {
             var distribusiId = window.location.pathname.split('/').pop();
@@ -126,7 +132,10 @@
                 var pengeluaran = distribusiId;
 
                 if ((totalJumlahSaatIni + totalJumlahBaru) > pengeluaran) {
-                    alert('Jumlah total melebihi pengeluaran yang ada pada distribusi ini.');
+                    // Ganti alert dengan menampilkan pesan di halaman
+                    $('#warningMessage').text(
+                        'Jumlah total melebihi pengeluaran yang ada pada distribusi ini.');
+                    $('#warningMessage').show();
                     return;
                 }
 
@@ -139,18 +148,21 @@
                     headers: {
                         'X-CSRF-TOKEN': '{{ csrf_token() }}'
                     },
+
                     success: function(data) {
-                        window.location.href = '/apps/distribusi_barang/view/' + distribusiId;
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Sukses',
+                            text: 'Data berhasil disimpan',
+                            confirmButtonColor: '#6777ef',
+                        }).then(function() {
+                            window.location.href = '/apps/distribusi_barang/view/' +
+                                distribusiId;
+                        });
                     },
                     error: function(xhr, status, error) {
-                        // Tangkap pesan error dari respons JSON
-                        var response = xhr.responseJSON;
-                        if (response && response.status === 'error') {
-                            alert(response.message);
-                        } else {
-                            console.error('There has been a problem with your AJAX operation:',
-                                error);
-                        }
+                        console.error('There has been a problem with your AJAX operation:',
+                            error);
                     }
                 });
             });

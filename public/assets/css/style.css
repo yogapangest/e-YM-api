@@ -4005,3 +4005,37 @@ canvas {
     font-size: 1.5rem;
     font-weight: bold;
 }
+
+.table td,
+.table th {
+    padding: 10px 15px; /* Menambahkan jarak di dalam sel tabel */
+}
+
+.table td {
+    white-space: nowrap; /* Mencegah teks untuk membungkus ke baris berikutnya */
+    overflow: hidden; /* Menyembunyikan teks yang meluap */
+    text-overflow: ellipsis; /* Menambahkan elipsis jika teks meluap */
+}
+
+/* .table th {
+    text-align: center;
+} */
+
+.table img {
+    max-width: 70px; /* Mengatur lebar gambar agar sesuai */
+    height: auto;
+}
+
+.btn {
+    margin-right: 5px; /* Menambahkan jarak antara tombol */
+}
+
+.card-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    color: #fff;
+}

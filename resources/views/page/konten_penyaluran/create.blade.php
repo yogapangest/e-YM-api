@@ -56,18 +56,53 @@
     </div>
     <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4="
         crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+
     <script>
         $(document).ready(function() {
 
             $('#KontenPenyaluranForm').submit(function(event) {
                 event.preventDefault();
 
-                var formData = new FormData();
-                formData.append('nama_penyaluran', $('#nama_penyaluran').val());
-                formData.append('deskripsi', $('#deskripsi').val());
-                if ($('#foto')[0].files[0]) {
-                    formData.append('foto', $('#foto')[0].files[0]);
+                // Ambil nilai dari setiap input
+                var namaPenyaluran = $('#nama_penyaluran').val();
+                var deskripsi = $('#deskripsi').val();
+                var foto = $('#foto')[0].files[0];
+
+                // Validasi form
+                let isValid = true;
+                let errorMessage = '';
+
+                if (!namaPenyaluran) {
+                    isValid = false;
+                    errorMessage = 'Nama penyaluran harus diisi';
+                } else if (!deskripsi) {
+                    isValid = false;
+                    errorMessage = 'Deskripsi harus diisi';
+                } else if (!foto) {
+                    isValid = false;
+                    errorMessage = 'Foto harus diunggah';
                 }
+
+                // Jika validasi gagal, tampilkan SweetAlert
+                if (!isValid) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: errorMessage,
+                        confirmButtonColor: '#6777ef',
+                    });
+                    return; // Hentikan eksekusi lebih lanjut
+                }
+
+                // Jika validasi berhasil, kirim form
+                var formData = new FormData();
+                formData.append('nama_penyaluran', namaPenyaluran);
+                formData.append('deskripsi', deskripsi);
+                if (foto) {
+                    formData.append('foto', foto);
+                }
+
                 $.ajax({
                     url: '/api/admin/manajemen/kontenpenyaluran',
                     method: 'POST',
@@ -78,11 +113,24 @@
                         'X-CSRF-TOKEN': '{{ csrf_token() }}'
                     },
                     success: function(data) {
-                        window.location.href = '/apps/konten_penyaluran/view';
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Sukses',
+                            text: 'Data berhasil disimpan',
+                            confirmButtonColor: '#6777ef',
+                        }).then(function() {
+                            window.location.href = '/apps/konten_penyaluran/view';
+                        });
                     },
                     error: function(xhr, status, error) {
                         console.error('There has been a problem with your AJAX operation:',
                             error);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Gagal',
+                            text: 'Terjadi kesalahan saat menyimpan data',
+                            confirmButtonColor: '#6777ef',
+                        });
                     }
                 });
             });

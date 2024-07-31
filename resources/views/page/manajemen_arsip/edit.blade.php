@@ -63,6 +63,8 @@
     </div>
     <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4="
         crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+
     <script>
         $(document).ready(function() {
             var arsipId = window.location.pathname.split('/')[3];
@@ -168,9 +170,19 @@
                         'X-CSRF-TOKEN': '{{ csrf_token() }}',
                         'X-HTTP-Method-Override': 'PUT' // Method Override untuk menggunakan PUT
                     },
+                    // success: function(data) {
+                    //     window.location.href = '/apps/arsip/view';
+                    //     loadArsipData(); // Memuat ulang data di halaman index
+                    // },
                     success: function(data) {
-                        window.location.href = '/apps/arsip/view';
-                        loadArsipData(); // Memuat ulang data di halaman index
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Sukses',
+                            text: 'Data berhasil disimpan',
+                            confirmButtonColor: '#6777ef',
+                        }).then(function() {
+                            window.location.href = '/apps/arsip/view';
+                        });
                     },
                     error: function(xhr, status, error) {
                         console.error('There has been a problem with your AJAX operation:',

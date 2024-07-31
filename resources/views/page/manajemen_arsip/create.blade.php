@@ -58,8 +58,12 @@
         </section>
     </div>
 
+    <!-- Sertakan jQuery -->
     <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4="
         crossorigin="anonymous"></script>
+    <!-- Sertakan SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+
     <script>
         $(document).ready(function() {
             // Load Program Data
@@ -107,36 +111,68 @@
                 }
             });
 
-
             // Handle Form Submission
             $('#arsipForm').submit(function(event) {
                 event.preventDefault();
 
-                var formData = new FormData(this);
-                formData.append('programs_id', $('#programs_id').val());
-                formData.append('jenisarsips_id', $('#jenisarsips_id').val());
-                if ($('#file')[0].files[0]) {
-                    formData.append('file', $('#file')[0].files[0]);
+                let isValid = true;
+                let fields = [{
+                        id: "programs_id",
+                        message: "Program harus diisi"
+                    },
+                    {
+                        id: "jenisarsips_id",
+                        message: "Jenis Arsip harus diisi"
+                    },
+                    {
+                        id: "file",
+                        message: "File harus diisi"
+                    },
+                ];
+
+                for (let field of fields) {
+                    let element = document.getElementById(field.id);
+                    if (!element.value) {
+                        isValid = false;
+                        Swal.fire({
+                            icon: "error",
+                            title: "Oops...",
+                            text: field.message,
+                            confirmButtonColor: "#6777ef",
+                        });
+                        element.focus();
+                        break; // Stop checking further fields after the first empty field is found
+                    }
                 }
 
-                $.ajax({
-                    url: '/api/admin/manajemen/arsip',
-                    method: 'POST',
-                    data: formData,
-                    processData: false,
-                    contentType: false,
-                    headers: {
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    },
-                    success: function(data) {
-                        window.location.href = '/apps/arsip/view';
-                        loadArsipData(); // Memuat ulang data di halaman index
-                    },
-                    error: function(xhr, status, error) {
-                        console.error('There has been a problem with your AJAX operation:',
-                            error);
-                    }
-                });
+                if (isValid) {
+                    var formData = new FormData($('#arsipForm')[0]);
+
+                    $.ajax({
+                        url: '/api/admin/manajemen/arsip',
+                        method: 'POST',
+                        data: formData,
+                        processData: false,
+                        contentType: false,
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        },
+                        success: function(data) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Sukses',
+                                text: 'Data berhasil disimpan',
+                                confirmButtonColor: '#6777ef',
+                            }).then(function() {
+                                window.location.href = '/apps/arsip/view';
+                            });
+                        },
+                        error: function(xhr, status, error) {
+                            console.error('There has been a problem with your AJAX operation:',
+                                error);
+                        }
+                    });
+                }
             });
         });
     </script>

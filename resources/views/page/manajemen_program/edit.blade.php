@@ -64,6 +64,8 @@
     </div>
     <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4="
         crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+
     <script>
         $(document).ready(function() {
             var url = window.location.href; // Ambil URL lengkap dari browser
@@ -135,10 +137,20 @@
                         'X-CSRF-TOKEN': '{{ csrf_token() }}',
                         'X-HTTP-Method-Override': 'PUT' // Method Override untuk menggunakan PUT
                     },
+                    // success: function(data) {
+                    //     console.log(data);
+                    //     window.location.href = data
+                    //         .url; // Redirect ke halaman setelah berhasil disimpan
+                    // },
                     success: function(data) {
-                        console.log(data);
-                        window.location.href = data
-                            .url; // Redirect ke halaman setelah berhasil disimpan
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Sukses',
+                            text: 'Data berhasil disimpan',
+                            confirmButtonColor: '#6777ef',
+                        }).then(function() {
+                            window.location.href = data.url;
+                        });
                     },
                     error: function(xhr, status, error) {
                         console.error('There has been a problem with your AJAX operation:',

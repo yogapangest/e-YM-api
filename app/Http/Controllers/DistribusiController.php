@@ -35,29 +35,31 @@ class DistribusiController extends Controller
     /**
  * Search for distribusi based on keyword.
  */
-    public function search(Request $request)
-    {
-        $keyword = $request->input('q');
+   public function search(Request $request)
+{
+    $keyword = $request->input('q');
 
-        // Lakukan pencarian jika terdapat kata kunci pencarian
-        if (!empty($keyword)) {
-            $distribusis = Distribusi::where('file', 'like', '%'.$keyword.'%')
-                                    ->orWhere('tempat', 'like', '%'.$keyword.'%')
-                                    ->orWhere('penerima_manfaat', 'like', '%'.$keyword.'%')
-                                    ->orWhereHas('program', function($query) use ($keyword) {
-                                        $query->where('nama', 'like', '%'.$keyword.'%');
-                                    })
-                                    ->paginate();
-        } else {
-            // Tampilkan semua data jika tidak ada kata kunci pencarian
-            $distribusis = Distribusi::with('program')->paginate();
-        }
-
-        // Jika ingin menjaga nilai input pencarian tetap ada
-        $query = $keyword;
-
-        return view('page.manajemen_distribusi.index', compact('distribusis', 'query'));
+    // Lakukan pencarian jika terdapat kata kunci pencarian
+    if (!empty($keyword)) {
+        $distribusis = Distribusi::where('file', 'like', '%'.$keyword.'%')
+                                ->orWhere('tempat', 'like', '%'.$keyword.'%')
+                                ->orWhere('penerima_manfaat', 'like', '%'.$keyword.'%')
+                                ->orWhereHas('program', function($query) use ($keyword) {
+                                    $query->where('nama_program', 'like', '%'.$keyword.'%'); // Sesuaikan dengan kolom nama di tabel programs
+                                })
+                                ->paginate();
+    } else {
+        // Tampilkan semua data jika tidak ada kata kunci pencarian
+        $distribusis = Distribusi::with('program')->paginate();
     }
+
+    // Jika ingin menjaga nilai input pencarian tetap ada
+    $query = $keyword;
+    // dd($distribusis);
+
+    return view('page.manajemen_distribusi.index', compact('distribusis', 'query'));
+}
+
 
 
     /**

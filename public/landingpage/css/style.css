@@ -694,7 +694,7 @@ section {
 --------------------------------------------------------------*/
 .penyaluran .icon-box {
     box-shadow: 0px 0 20px 0 rgba(0, 0, 0, 0.1);
-    padding: 50px 30px;
+    padding: 50px 25px;
     transition: all ease-in-out 0.4s;
     background: #fff;
     text-align: center;
@@ -726,26 +726,26 @@ section {
     transform: translateY(-10px);
 }
 
-.grid-container {
+/* .grid-container {
     display: flex;
-    flex-wrap: nowrap; /* Prevent items from wrapping to the next line */
+    flex-wrap: nowrap;
     gap: 20px;
 }
 
 .scrollable-content {
-    overflow-x: auto; /* Enable horizontal scrolling */
-    white-space: nowrap; /* Prevent text from wrapping and allow horizontal scrolling */
+    overflow-x: auto;
+    white-space: nowrap;
 }
 
 .grid-item {
-    flex: 0 0 auto; /* Prevent items from shrinking */
-    min-width: 200px; /* Ensure items have a minimum width */
-    margin-right: 20px; /* Add space between items */
+    flex: 0 0 auto;
+    min-width: 200px;
+    margin-right: 20px;
     display: flex;
     flex-direction: column;
     align-items: center;
     cursor: pointer;
-}
+} */
 
 .grid-item.expanded {
     transform: scale(1.1);
@@ -760,7 +760,7 @@ section {
     display: none;
 }
 
-.detail-view {
+/* .detail-view {
     display: none;
     position: fixed;
     top: 0;
@@ -771,13 +771,13 @@ section {
     justify-content: center;
     align-items: center;
     z-index: 1000;
-}
+} */
 
 .detail-view.active {
     display: flex;
 }
 
-.detail-content {
+/* .detail-content {
     background: #fff;
     padding: 40px;
     border-radius: 10px;
@@ -793,7 +793,7 @@ section {
     right: 10px;
     font-size: 24px;
     cursor: pointer;
-}
+} */
 
 .partial-description {
     overflow: hidden;
@@ -1171,4 +1171,46 @@ section {
 
 .single-item {
     text-align: center; /* center alignment */
+}
+
+.scrollable-content {
+    overflow-x: auto;
+    white-space: nowrap;
+}
+.grid-container {
+    display: flex;
+}
+.grid-item {
+    display: inline-block;
+    margin-right: 20px;
+    vertical-align: top;
+}
+.detail-view {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+.detail-content {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    width: 60%;
+    max-width: 600px;
+    margin: auto;
+    text-align: center;
+}
+.close-btn {
+    cursor: pointer;
+    float: right;
+    font-size: 20px;
+}
+.full-description {
+    display: none;
 }

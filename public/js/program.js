@@ -1,8 +1,8 @@
-document.getElementById("programForm").addEventListener("submit", function (e) {
+document.getElementById("ProgramForm").addEventListener("submit", function (e) {
     let isValid = true;
     let fields = [
         {
-            id: "nama",
+            id: "nama_program",
             message: "Nama harus diisi",
         },
         {

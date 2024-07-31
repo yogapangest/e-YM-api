@@ -19,17 +19,17 @@
                     <div class="col-12">
                         <div class="card">
                             <div class="card-header">
-                                <h4>Daftar Donasi</h4>
-                                <div class="card-header-form">
-                                    <div class="ml-auto mb-2">
-                                        <a href="{{ route('index.create.datadonasi') }}" style="float: right;"
-                                            class="btn btn-round btn-primary mb-3">Tambah</a>
-                                    </div>
-                                    <form>
-                                        <div class="input-group">
-                                            <input type="text" class="form-control" placeholder="Search">
+                                <h4>Daftar Donatur</h4>
+                                <div class="card-header-form d-flex justify-content-between align-items-center">
+                                    <a href="{{ route('index.create.datadonasi') }}" style="float: right;"
+                                        class="btn btn-round btn-primary mb-3">Tambah</a>
+                                    <form class="mb-3" id="search-form">
+                                        <div class="input-group ">
+                                            <input id="search" type="text" class="form-control"
+                                                placeholder="Cari Nama/Alamat">
                                             <div class="input-group-btn">
-                                                <button class="btn btn-primary"><i class="fas fa-search"></i></button>
+                                                <button id="search-btn" type="button" class="btn btn-primary"><i
+                                                        class="fas fa-search"></i></button>
                                             </div>
                                         </div>
                                     </form>
@@ -62,87 +62,156 @@
     </div>
     <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4="
         crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+
     <script>
         $(document).ready(function() {
-            $.ajax({
-                url: '/api/admin/manajemen/data-donasi',
-                method: 'GET',
-                success: function(data) {
-                    if (Array.isArray(data.user)) {
-                        var tableBody = $('#table-data-donasi');
+            function searchUsers(query) {
+                $.ajax({
+                    url: '/api/admin/manajemen/data-donasi',
+                    method: 'GET',
+                    data: {
+                        search: query
+                    },
+                    success: function(data) {
+                        if (Array.isArray(data.user)) {
+                            var tableBody = $('#table-data-donasi');
+                            tableBody.empty(); // Bersihkan tabel sebelum menambahkan baris baru
 
-                        var index = 1;
-                        // Iterasi setiap kegiatan dalam data
-                        data.user.forEach(function(user) {
-                            // Buat baris tabel baru
-                            var row = $('<tr></tr>');
+                            var index = 1;
+                            // Iterasi setiap pengguna dalam data
+                            data.user.forEach(function(user) {
+                                // Buat baris tabel baru
+                                var row = $('<tr></tr>');
 
-                            // Tambahkan data kolom
-                            row.append('<td>' + index + '</td>');
-                            row.append('<td>' + user.name + '</td>');
-                            row.append('<td>' + user.alamat + '</td>');
-                            row.append('<td>' + user.telephone + '</td>');
-                            row.append('<td>' + user.email + '</td>');
+                                // Tambahkan data kolom
+                                row.append('<td>' + index + '</td>');
+                                row.append('<td>' + user.name + '</td>');
+                                row.append('<td>' + user.alamat + '</td>');
+                                row.append('<td>' + user.telephone + '</td>');
+                                row.append('<td>' + user.email + '</td>');
 
-                            row.append('<td><a href="' + '/apps/donasi/view/' +
-                                user
-                                .id +
-                                '" class="btn btn-primary"><i class="fas fa-clipboard-list"></i></a></td>'
-                            );
+                                row.append('<td><a href="' + '/apps/donasi/view/' + user.id +
+                                    '" class="btn btn-primary"><i class="fas fa-clipboard-list"></i></a></td>'
+                                );
 
-                            row.append(
-                                '<td style="display: flex; justify-content: center; align-items: center;"><a href="' +
-                                '/apps/data_donasi/' + user.id +
-                                '/edit' +
-                                '" class="mr-1 btn btn-primary"><i class="fas fa-edit"></i></a><button data-id="' +
-                                user.id +
-                                '" class="btn btn-danger delete-button"><i class="fas fa-trash-alt"></i></button></td>'
-                            );
+                                row.append(
+                                    '<td style="display: flex; justify-content: center; align-items: center;"><a href="' +
+                                    '/apps/data_donasi/' + user.id + '/edit' +
+                                    '" class="mr-1 btn btn-primary"><i class="fas fa-edit"></i></a><button data-id="' +
+                                    user.id +
+                                    '" class="btn btn-danger delete-button"><i class="fas fa-trash-alt"></i></button></td>'
+                                );
 
+                                // Tambahkan baris ke dalam tabel
+                                tableBody.append(row);
 
-                            // Tambahkan baris ke dalam tabel
-                            tableBody.append(row);
+                                index++;
+                            });
 
-                            index++;
-
-                        });
-
-                        $('.delete-button').on('click', function() {
-                            var id_data_donasi = $(this).data('id');
-                            console.log(id_data_donasi);
-                            deleteDataDonasi(id_data_donasi, $(this).closest('tr'));
-
-                        });
+                            $('.delete-button').on('click', function() {
+                                var id_data_donasi = $(this).data('id');
+                                deleteDataDonasi(id_data_donasi, $(this).closest('tr'));
+                            });
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('There has been a problem with your AJAX operation:', error);
                     }
-                },
-                error: function(xhr, status, error) {
-                    console.error('There has been a problem with your AJAX operation:', error);
-                }
+                });
+            }
+
+            // Panggil fungsi pencarian saat halaman dimuat
+            searchUsers('');
+
+            // Event handler untuk pencarian
+            $('#search-btn').on('click', function() {
+                var query = $('#search').val();
+                searchUsers(query);
             });
 
-            function deleteDataDonasi(id_data_donasi, row) {
-                if (confirm('Apa Anda yakin ingin menghapus Data User ini?')) {
-                    $.ajax({
-                        url: '/api/admin/manajemen/data-donasi/delete/' + id_data_donasi,
-                        method: 'DELETE',
-                        headers: {
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                        },
-                        success: function(response) {
-                            if (response.status === 'success') {
-                                alert('Data Donasi deleted successfully');
-                                // Remove the kegiatan row from the table
-                                row.remove();
+            $('#search-form').on('submit', function(event) {
+                event.preventDefault(); // Mencegah form dari submit
+                var query = $('#search').val();
+                searchUsers(query);
+            });
 
-                            } else {
-                                alert('Failed to delete Data Donasi');
+            // function deleteDataDonasi(id_data_donasi, row) {
+            //     if (confirm('Apa Anda yakin ingin menghapus Data User ini?')) {
+            //         $.ajax({
+            //             url: '/api/admin/manajemen/data-donasi/delete/' + id_data_donasi,
+            //             method: 'DELETE',
+            //             headers: {
+            //                 'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            //             },
+            //             success: function(response) {
+            //                 if (response.status === 'success') {
+            //                     alert('Data Donasi deleted successfully');
+            //                     // Remove the data row from the table
+            //                     row.remove();
+            //                 } else {
+            //                     alert('Failed to delete Data Donasi');
+            //                 }
+            //             },
+            //             error: function(xhr, status, error) {
+            //                 console.error('There has been a problem with your AJAX operation:', error);
+            //             }
+            //         });
+            //     }
+            // }
+
+            function deleteDataDonasi(id_data_donasi, row) {
+                Swal.fire({
+                    title: 'Apakah Anda yakin?',
+                    text: 'Anda tidak dapat mengembalikan data yang telah dihapus!',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#6777ef',
+                    confirmButtonText: 'Ya, hapus!',
+                    cancelButtonText: 'Batal'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: '/api/admin/manajemen/data-donasi/delete/' + id_data_donasi,
+                            method: 'DELETE',
+                            headers: {
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                            },
+                            success: function(response) {
+                                console.log(response); // Log respons untuk debugging
+                                if (response.status === 'success') {
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: 'Sukses',
+                                        text: response.message,
+                                        confirmButtonColor: '#6777ef',
+                                    }).then(function() {
+                                        window.location.href = '/apps/data_donasi/view';
+                                    });
+                                } else {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Gagal',
+                                        text: response.message ||
+                                            'Data tidak dapat dihapus',
+                                        confirmButtonColor: '#6777ef',
+                                    });
+                                }
+                            },
+                            error: function(xhr, status, error) {
+                                console.error('Terjadi masalah dengan operasi AJAX Anda:',
+                                    error);
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Gagal',
+                                    text: 'Terjadi kesalahan saat menghapus data',
+                                    confirmButtonColor: '#6777ef',
+                                });
                             }
-                        },
-                        error: function(xhr, status, error) {
-                            console.error('There has been a problem with your AJAX operation:', error);
-                        }
-                    });
-                }
+                        });
+                    }
+                });
             }
         });
     </script>

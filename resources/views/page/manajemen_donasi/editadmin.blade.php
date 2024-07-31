@@ -1,6 +1,5 @@
 @extends('administrator.layouts.app')
 
-
 @section('content')
     <!-- Main Content -->
     <div class="main-content">
@@ -18,20 +17,22 @@
                                 <div class="form-group">
                                     <label for="deskripsi">Deskripsi</label>
                                     <input id="deskripsi" type="text"
-                                        class="form-control @error('deskripsi') is-invalid @enderror" name="deskripsi">
+                                        class="form-control @error('deskripsi') is-invalid @enderror" name="deskripsi"
+                                        value="{{ old('deskripsi') }}">
                                     @error('deskripsi')
                                         <div id="deskripsi" class="form-text">{{ $message }}</div>
                                     @enderror
                                 </div>
                                 <div class="form-group">
-                                    <label for="nominal">Nominal</label>
-                                    <input id="nominal" type="text"
-                                        class="form-control @error('nominal') is-invalid @enderror" name="nominal">
+                                    <label for="nominal_display">Nominal</label>
+                                    <input id="nominal_display" type="text"
+                                        class="form-control @error('nominal_display') is-invalid @enderror"
+                                        name="nominal_display" value="{{ old('nominal_display') }}">
+                                    <input id="nominal" type="hidden" name="nominal" value="{{ old('nominal') }}">
                                     @error('nominal')
-                                        <div id="nominal" class="form-text">{{ $message }}</div>
+                                        <div id="nominal_display" class="form-text">{{ $message }}</div>
                                     @enderror
                                 </div>
-
 
                                 <div class="form-group">
                                     <label for="file" class="form-label">File</label>
@@ -40,34 +41,13 @@
                                     @error('file')
                                         <div id="file" class="form-file">{{ $message }}</div>
                                     @enderror
-
                                 </div>
-
 
                                 <div class="form-group">
                                     <button type="submit" class="btn btn-primary">
                                         Update Donasi
                                     </button>
                                 </div>
-                                <script>
-                                    document.addEventListener('DOMContentLoaded', function() {
-                                        var nominalInput = document.getElementById('nominal');
-
-                                        nominalInput.addEventListener('input', function(e) {
-                                            // Menghilangkan karakter non-digit
-                                            var value = e.target.value.replace(/[^,\d]/g, '');
-
-                                            // Mengubah menjadi format angka dengan titik
-                                            e.target.value = new Intl.NumberFormat('id-ID').format(value);
-                                        });
-
-                                        // Fungsi untuk menghilangkan format saat mengirim data
-                                        nominalInput.closest('form').addEventListener('submit', function() {
-                                            nominalInput.value = nominalInput.value.replace(/\./g, '');
-                                        });
-                                    });
-                                </script>
-
                             </form>
                         </div>
                     </div>
@@ -77,6 +57,8 @@
     </div>
     <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4="
         crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+
     <script>
         $(document).ready(function() {
             var rekapDonasiId = window.location.pathname.split('/')[4];
@@ -87,13 +69,8 @@
                 method: 'GET',
                 success: function(data) {
                     if (data.donasi) {
-                        console.log(data.donasi)
-                        $('#users_id').val(data.donasi.users_id);
                         $('#deskripsi').val(data.donasi.deskripsi);
-                        $('#nominal').val(data.donasi.nominal);
-                        $('#file').val(data.donasi.file);
-
-
+                        $('#nominal_display').val(formatRupiah(data.donasi.nominal));
                     } else {
                         console.error('Unexpected data format:', data);
                     }
@@ -103,16 +80,26 @@
                 }
             });
 
+            function formatRupiah(number) {
+                return 'Rp ' + number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+            }
+
+            function parseRupiah(rupiah) {
+                return rupiah.replace(/[^0-9]/g, '');
+            }
+
+            $('#nominal_display').on('input', function() {
+                var rawValue = parseRupiah($(this).val());
+                $('#nominal').val(rawValue);
+                $(this).val(formatRupiah(rawValue));
+            });
+
             // Mengirim data yang diperbarui saat form disubmit
             $('#UpdateForm').submit(function(event) {
                 event.preventDefault();
 
                 var formData = new FormData(this);
-                // formData.append('distribusis_id', $('#distribusis_id').val());
-                // formData.append('nama_barang', $('#nama_barang').val());
-                // formData.append('volume', $('#volume').val());
-                // formData.append('satuan', $('#satuan').val());
-                // formData.append('harga_satuan', $('#harga_satuan').val());
+                formData.set('nominal', $('#nominal').val());
 
                 $.ajax({
                     url: '/api/admin/manajemen/rekap-donasi/update/' + rekapDonasiId,
@@ -125,7 +112,14 @@
                         'X-HTTP-Method-Override': 'PUT' // Method Override untuk menggunakan PUT
                     },
                     success: function(data) {
-                        window.location.href = data.url;
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Sukses',
+                            text: 'Data berhasil disimpan',
+                            confirmButtonColor: '#6777ef',
+                        }).then(function() {
+                            window.location.href = data.url;
+                        });
                     },
                     error: function(xhr, status, error) {
                         console.error('There has been a problem with your AJAX operation:',

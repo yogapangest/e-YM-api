@@ -12,27 +12,37 @@ use Illuminate\Support\Facades\Hash;
 
 class DataDonasiController extends Controller
 {
-    public function index()
-    {
-        try {
-            $users = User::where('role','User')->get();
+    public function index(Request $request)
+{
+    try {
+        // Ambil parameter pencarian dari query string
+        $search = $request->query('search', '');
 
-            $url = '/admin/user';
+        // Filter data berdasarkan nama dan alamat jika parameter pencarian tidak kosong
+        $users = User::where('role', 'User')
+            ->where(function ($query) use ($search) {
+                $query->where('name', 'like', "%{$search}%")
+                      ->orWhere('alamat', 'like', "%{$search}%");
+            })
+            ->get();
 
-            return response()->json([
-                'status' => 'succes',
-                'message' => 'Get data user successfull',
-                'user' => $users,
-                'url' => $url,
-            ]);
-        } catch (Exception $e) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Failed to get user',
-                'error' => $e->getMessage()
-            ], 500);
-        }
+        $url = '/admin/user';
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Get data user successful',
+            'user' => $users,
+            'url' => $url,
+        ]);
+    } catch (Exception $e) {
+        return response()->json([
+            'status' => 'error',
+            'message' => 'Failed to get user',
+            'error' => $e->getMessage()
+        ], 500);
     }
+}
+
 
     public function store(Request $request)
     {
@@ -157,7 +167,7 @@ class DataDonasiController extends Controller
 
             return response()->json([
                 'status' => 'success',
-                'message' => 'data donasi has been removed',
+                'message' => 'Data Donasi Behasil Dihapus',
                 'url' => $url,
             ]);
         } catch (Exception $e) {

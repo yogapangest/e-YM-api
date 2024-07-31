@@ -118,7 +118,7 @@ class JenisArsipController extends Controller
 
             return response()->json([
                 'status' => 'success',
-                'message' => 'jenisarsip has been removed',
+                'message' => 'Jenis Arsip Berhasil Dihapus',
                 'url' => $url,
             ]);
         } catch (\Exception $e) {

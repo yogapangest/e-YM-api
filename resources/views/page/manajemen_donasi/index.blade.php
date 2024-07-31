@@ -23,14 +23,14 @@
                             <div class="card-header">
                                 <h4>Daftar Donasi</h4>
                                 <div class="card-header-form">
-                                    <form>
+                                    {{-- <form>
                                         <div class="input-group">
                                             <input type="text" class="form-control" placeholder="Search">
                                             <div class="input-group-btn">
                                                 <button class="btn btn-primary"><i class="fas fa-search"></i></button>
                                             </div>
                                         </div>
-                                    </form>
+                                    </form> --}}
                                 </div>
                             </div>
                             <div class="card-body p-0">
@@ -42,7 +42,7 @@
                                             <th>Deskripsi</th>
                                             <th>Nominal</th>
                                             <th>File</th>
-                                            <th class="text-center">Aksi</th>
+                                            {{-- <th class="text-center">Aksi</th> --}}
 
                                         </tr>
                                         <tbody id="table-rekap-donasi">
@@ -110,14 +110,14 @@
                                 }
                             }
 
-                            row.append(
-                                '<td style="display: flex; justify-content: center; align-items: center;"><a href="' +
-                                '/apps/donasi/' + donasi.id +
-                                '/edit' +
-                                '" class="mr-1 btn btn-primary"><i class="fas fa-edit"></i></a><button data-id="' +
-                                donasi.id +
-                                '" class="btn btn-danger delete-button"><i class="fas fa-trash-alt"></i></button></td>'
-                            );
+                            // row.append(
+                            //     '<td style="display: flex; justify-content: center; align-items: center;"><a href="' +
+                            //     '/apps/donasi/' + donasi.id +
+                            //     '/edit' +
+                            //     '" class="mr-1 btn btn-primary"><i class="fas fa-edit"></i></a><button data-id="' +
+                            //     donasi.id +
+                            //     '" class="btn btn-danger delete-button"><i class="fas fa-trash-alt"></i></button></td>'
+                            // );
 
 
                             // Tambahkan baris ke dalam tabel

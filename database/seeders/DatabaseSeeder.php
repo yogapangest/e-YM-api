@@ -18,7 +18,7 @@ class DatabaseSeeder extends Seeder
             'email' => 'admin@gmail.com',
             'username' => 'admin',
             'alamat' => 'yatimmandiri1',
-            'telephone' => '0812768913',
+            'telephone' => '081276891376',
             'password' => '12345678',
             'role' => 'Admin',
         ]);

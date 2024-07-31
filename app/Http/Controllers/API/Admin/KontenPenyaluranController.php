@@ -37,7 +37,7 @@ class KontenPenyaluranController extends Controller
             $validatedData = $request->validate([
                 'nama_penyaluran' => 'required|string|max:255',
                 'deskripsi' => 'required|string',
-                'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,jpg,png|max:2048',
+                'foto' => 'required|image|mimes:jpeg,png,jpg,gif,svg,jpg,png|max:2048',
 
             ]);
             if ($request->hasFile('foto')) {
@@ -96,7 +96,7 @@ class KontenPenyaluranController extends Controller
             $validatedData = $request->validate([
                 'nama_penyaluran' => 'required|string|max:255',
                 'deskripsi' => 'required|string',
-                'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,jpg,png|max:2048',
+                'foto' => 'required|image|mimes:jpeg,png,jpg,gif,svg,jpg,png|max:2048',
             ]);
 
             if ($request->hasFile('foto')) {
@@ -108,8 +108,6 @@ class KontenPenyaluranController extends Controller
                 $FileName = uniqid('kontenpenyaluran_') . '.' . $files->getClientOriginalExtension();
                 $files->move(public_path('file/kontenpenyaluran'), $FileName);
                 $validatedData['foto'] = $FileName;
-            } else {
-                $validatedData['foto'] = $donasis->file;
             }
             $kontenpenyalurans->update($validatedData);
             $url = '/apps/konten_penyaluran/view';
@@ -143,7 +141,7 @@ class KontenPenyaluranController extends Controller
 
             return response()->json([
                 'status' => 'success',
-                'message' => 'Konten penyaluran has been removed',
+                'message' => 'Konten Penyaluran has been removed',
                 'url' => $url,
             ]);
         } catch (Exception $e) {

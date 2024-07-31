@@ -1,15 +1,15 @@
 document
-    .getElementById("jenisArsipForm")
+    .getElementById("JenisArsipForm")
     .addEventListener("submit", function (e) {
         let isValid = true;
         let fields = [
             {
-                id: "nama",
+                id: "nama_arsip",
                 message: "Nama harus diisi",
             },
             {
-                id: "keterangan",
-                message: "Keterangan harus diisi",
+                id: "deskripsi",
+                message: "Deskripsi harus diisi",
             },
         ];
 

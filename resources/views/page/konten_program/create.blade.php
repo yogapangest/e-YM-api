@@ -48,17 +48,48 @@
     </div>
     <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4="
         crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+
     <script>
         $(document).ready(function() {
 
             $('#KontenProgramForm').submit(function(event) {
                 event.preventDefault();
 
-                var formData = new FormData();
-                formData.append('nama_kontenprogram', $('#nama_kontenprogram').val());
-                if ($('#foto')[0].files[0]) {
-                    formData.append('foto', $('#foto')[0].files[0]);
+                // Ambil nilai dari setiap input
+                var namaKontenProgram = $('#nama_kontenprogram').val();
+                var foto = $('#foto')[0].files[0];
+
+                // Validasi form
+                let isValid = true;
+                let errorMessage = '';
+
+                if (!namaKontenProgram) {
+                    isValid = false;
+                    errorMessage = 'Nama konten program harus diisi';
+                } else if (!foto) {
+                    isValid = false;
+                    errorMessage = 'Foto harus diunggah';
                 }
+
+                // Jika validasi gagal, tampilkan SweetAlert
+                if (!isValid) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: errorMessage,
+                        confirmButtonColor: '#6777ef',
+                    });
+                    return; // Hentikan eksekusi lebih lanjut
+                }
+
+                // Jika validasi berhasil, kirim form
+                var formData = new FormData();
+                formData.append('nama_kontenprogram', namaKontenProgram);
+                if (foto) {
+                    formData.append('foto', foto);
+                }
+
                 $.ajax({
                     url: '/api/admin/manajemen/kontenprogram',
                     method: 'POST',
@@ -69,11 +100,24 @@
                         'X-CSRF-TOKEN': '{{ csrf_token() }}'
                     },
                     success: function(data) {
-                        window.location.href = '/apps/konten_program/view';
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Sukses',
+                            text: 'Data berhasil disimpan',
+                            confirmButtonColor: '#6777ef',
+                        }).then(function() {
+                            window.location.href = '/apps/konten_program/view';
+                        });
                     },
                     error: function(xhr, status, error) {
                         console.error('There has been a problem with your AJAX operation:',
                             error);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Gagal',
+                            text: 'Terjadi kesalahan saat menyimpan data',
+                            confirmButtonColor: '#6777ef',
+                        });
                     }
                 });
             });

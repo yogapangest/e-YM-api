@@ -20,24 +20,22 @@
                         <div class="card">
                             <div class="card-header">
                                 <h4>Daftar Distribusi</h4>
-                                <div class="card-header-form">
-                                    <div class="ml-auto mb-2">
-                                        <a href="{{ route('index.create.distribusi') }}" style="float: right;"
-                                            class="btn btn-round btn-primary mb-3">Tambah</a>
-                                    </div>
-                                    <form method="GET" action="{{ route('index.search.distribusi') }}">
+
+                                <div class="card-header-form d-flex justify-content-between align-items-center">
+                                    <a href="{{ route('index.create.distribusi') }}"
+                                        class="btn btn-round btn-primary mb-3">Tambah</a>
+                                    <form id="search-form" class="mb-3">
                                         <div class="input-group">
-                                            <input type="text" class="form-control" name="q" placeholder="Search"
-                                                value="{{ isset($query) ? $query : '' }}">
+                                            <input type="text" id="search-query" class="form-control" name="q"
+                                                placeholder="Search" value="{{ isset($query) ? $query : '' }}">
                                             <div class="input-group-btn">
                                                 <button class="btn btn-primary" type="submit"><i
                                                         class="fas fa-search"></i></button>
                                             </div>
                                         </div>
                                     </form>
-
-
                                 </div>
+
                             </div>
                             <div class="card-body p-0">
                                 <div class="table-responsive">
@@ -72,101 +70,99 @@
     </div>
     <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4="
         crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
     <script>
         $(document).ready(function() {
-            $.ajax({
-                url: '/api/admin/manajemen/distribusi',
-                method: 'GET',
-                success: function(data) {
-                    console.log(data)
-                    if (Array.isArray(data.distribusi)) {
-                        var tableBody = $('#table-distribusi');
+            function loadDistribusi(query = '') {
+                $.ajax({
+                    url: '/api/admin/manajemen/distribusi',
+                    method: 'GET',
+                    data: {
+                        q: query
+                    },
+                    success: function(data) {
+                        if (Array.isArray(data.distribusi)) {
+                            var tableBody = $('#table-distribusi');
+                            tableBody.empty(); // Kosongkan tabel sebelum memuat data baru
 
-                        var index = 1;
-                        // Iterasi setiap kegiatan dalam data
-                        data.distribusi.forEach(function(distribusi) {
+                            var index = 1;
+                            data.distribusi.forEach(function(distribusi) {
+                                var date = new Date(distribusi.tanggal);
+                                var formattedDate = formatTanggal(date);
 
-                            var date = new Date(distribusi.tanggal);
-                            var formattedDate = formatTanggal(date);
-                            // Buat baris tabel baru
-                            var row = $('<tr></tr>');
+                                var row = $('<tr></tr>');
 
-                            // Tambahkan data kolom
-                            row.append('<td>' + index + '</td>');
-                            row.append('<td>' + distribusi.program.nama_program + '</td>');
-                            row.append('<td>' + formattedDate + '</td>');
-                            row.append('<td>' + distribusi.tempat + '</td>');
-                            row.append('<td>' + distribusi.penerima_manfaat + '</td>');
-                            row.append('<td>' + formatRupiah(distribusi.anggaran) + '</td>');
-                            row.append('<td>' + formatRupiah(distribusi.pengeluaran) + '</td>');
-                            row.append('<td>' + formatRupiah(distribusi.sisa) + '</td>');
+                                row.append('<td style="padding: 10px 45;">' + index + '</td>');
+                                row.append('<td style="padding: 10px 45;">' + distribusi.program
+                                    .nama_program + '</td>');
+                                row.append('<td style="padding: 13px 38px;">' + formattedDate +
+                                    '</td>');
+                                row.append('<td style="padding: 10px 45;">' + distribusi
+                                    .tempat + '</td>');
+                                row.append('<td style="padding: 10px 45;">' + distribusi
+                                    .penerima_manfaat + '</td>');
+                                row.append('<td style="padding: 10px 45;">' + formatRupiah(
+                                    distribusi.anggaran) + '</td>');
+                                row.append('<td style="padding: 10px 45;">' + formatRupiah(
+                                    distribusi.pengeluaran) + '</td>');
+                                row.append('<td style="padding: 10px 45;">' + formatRupiah(
+                                    distribusi.sisa) + '</td>');
 
+                                var fileUrl = distribusi.file;
 
-                            var fileUrl = distribusi.file; // URL file
+                                if (!fileUrl) {
+                                    row.append(
+                                        '<td style="padding: 10px 45;">Tidak ada file</td>');
+                                } else {
+                                    var fileExtension = fileUrl.split('.').pop().toLowerCase();
 
-                            if (!fileUrl) {
-                                fileUrl = null
-                                row.append('<td>' + null + '</td>');
-
-                            } else {
-                                // Tentukan tipe file berdasarkan ekstensi
-                                var fileExtension = fileUrl.split('.').pop().toLowerCase();
-
-                                if (['jpg', 'jpeg', 'png', 'gif'].includes(fileExtension)) {
-                                    // Jika file gambar, buat elemen img
-                                    row.append('<td><img src="' + '/file/distribusi/' +
-                                        fileUrl +
-                                        '" alt="' + distribusi.file +
-                                        '" style="width: 70px; height: auto; border-radius: 0;"></td>'
-                                    );
-                                } else if (fileExtension === 'pdf') {
-                                    // Jika file PDF, buat link untuk mengunduh
-                                    row.append('<td><a href="' + '/file/distribusi/' + fileUrl +
-                                        '" class="btn btn-primary"><i class="fas fa-file"></i></a></td>'
-                                    );
+                                    if (['jpg', 'jpeg', 'png', 'gif'].includes(fileExtension)) {
+                                        row.append(
+                                            '<td style="padding: 10px 45;"><img src="/file/distribusi/' +
+                                            fileUrl + '" alt="' + distribusi.file +
+                                            '" style="width: 70px; height: auto; border-radius: 0;"></td>'
+                                        );
+                                    } else if (fileExtension === 'pdf') {
+                                        row.append(
+                                            '<td style="padding: 10px 45;"><a href="/file/distribusi/' +
+                                            fileUrl +
+                                            '" class="btn btn-primary"><i class="fas fa-file"></i></a></td>'
+                                        );
+                                    }
                                 }
-                            }
-                            // Tambahkan URL dinamis untuk ikon barang
 
-                            row.append('<td><a href="' + '/apps/distribusi_barang/view/' +
-                                distribusi
-                                .id +
-                                '" class="btn btn-primary"><i class="fas fa-shopping-cart"></i></a></td>'
-                            );
+                                row.append(
+                                    '<td style="padding: 10px 45;"><a href="/apps/distribusi_barang/view/' +
+                                    distribusi.id +
+                                    '" class="btn btn-primary"><i class="fas fa-shopping-cart"></i></a></td>'
+                                );
+                                row.append(
+                                    '<td style="padding: 10px 45;" class="d-flex align-items-center"><a href="/apps/distribusi/' +
+                                    distribusi.id +
+                                    '/edit" class="mr-1 btn btn-primary"><i class="fas fa-edit"></i></a><button data-id="' +
+                                    distribusi.id +
+                                    '" class="btn btn-danger delete-button"><i class="fas fa-trash-alt"></i></button></td>'
+                                );
 
-                            row.append('<td class="d-flex align-items-center"><a href="' +
-                                '/apps/distribusi/' + distribusi.id +
-                                '/edit' +
-                                '" class="mr-1 btn btn-primary"><i class="fas fa-edit"></i></a><button data-id="' +
-                                distribusi.id +
-                                '" class="btn btn-danger delete-button"><i class="fas fa-trash-alt"></i></button></td>'
-                            );
+                                tableBody.append(row);
+                                index++;
+                            });
 
-
-                            // Tambahkan baris ke dalam tabel
-                            tableBody.append(row);
-
-                            index++;
-
-                        });
-
-                        $('.delete-button').on('click', function() {
-                            var distribusi = $(this).data('id');
-                            console.log(distribusi);
-                            deleteProgram(distribusi, $(this).closest('tr'));
-
-                        });
+                            $('.delete-button').on('click', function() {
+                                var distribusi = $(this).data('id');
+                                deleteDistribusi(distribusi, $(this).closest('tr'));
+                            });
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('There has been a problem with your AJAX operation:', error);
                     }
-                },
-                error: function(xhr, status, error) {
-                    console.error('There has been a problem with your AJAX operation:', error);
-                }
-            });
+                });
+            }
 
             function formatTanggal(date) {
-                var bulan = [
-                    "Januari", "Februari", "Maret", "April", "Mei", "Juni",
-                    "Juli", "Agustus", "September", "Oktober", "November", "Desember"
+                var bulan = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September",
+                    "Oktober", "November", "Desember"
                 ];
                 var tanggal = date.getDate();
                 var bulanNama = bulan[date.getMonth()];
@@ -178,30 +174,71 @@
                 return 'Rp ' + number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
             }
 
-            function deleteProgram(distribusi, row) {
-                if (confirm('Apa Anda yakin ingin menghapus distribusi ini?')) {
-                    $.ajax({
-                        url: '/api/admin/manajemen/distribusi/delete/' + distribusi,
-                        method: 'DELETE',
-                        headers: {
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                        },
-                        success: function(response) {
-                            if (response.status === 'success') {
-                                alert('kegiatan deleted successfully');
-                                // Remove the kegiatan row from the table
-                                row.remove();
 
-                            } else {
-                                alert('Failed to delete distribusi');
+
+            function deleteDistribusi(distribusi, row) {
+                Swal.fire({
+                    title: 'Apakah Anda yakin?',
+                    text: 'Anda tidak dapat mengembalikan data yang telah dihapus!',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#6777ef',
+                    confirmButtonText: 'Ya, hapus!',
+                    cancelButtonText: 'Batal'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: '/api/admin/manajemen/distribusi/delete/' + distribusi,
+                            method: 'DELETE',
+                            headers: {
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                            },
+                            success: function(response) {
+                                console.log(response); // Log respons untuk debugging
+                                if (response.status === 'success') {
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: 'Sukses',
+                                        text: response.message,
+                                        confirmButtonColor: '#6777ef',
+                                    }).then(function() {
+                                        window.location.href = '/apps/distribusi/view';
+                                    });
+                                } else {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Gagal',
+                                        text: response.message ||
+                                            'Data tidak dapat dihapus',
+                                        confirmButtonColor: '#6777ef',
+                                    });
+                                }
+                            },
+                            error: function(xhr, status, error) {
+                                console.error('Terjadi masalah dengan operasi AJAX Anda:',
+                                    error);
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Gagal',
+                                    text: 'Terjadi kesalahan saat menghapus data',
+                                    confirmButtonColor: '#6777ef',
+                                });
                             }
-                        },
-                        error: function(xhr, status, error) {
-                            console.error('There has been a problem with your AJAX operation:', error);
-                        }
-                    });
-                }
+                        });
+                    }
+                });
             }
+
+            // Load data awal
+            loadDistribusi();
+
+            // Event listener untuk form pencarian
+            $('#search-form').on('submit', function(e) {
+                e.preventDefault();
+                var query = $('#search-query').val();
+                loadDistribusi(query);
+            });
         });
     </script>
 @endsection

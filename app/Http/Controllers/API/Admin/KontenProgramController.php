@@ -36,7 +36,7 @@ class KontenProgramController extends Controller
         try {
             $validatedData = $request->validate([
                 'nama_kontenprogram' => 'required|string|max:255',
-                'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,jpg,png|max:2048',
+                'foto' => 'required|image|mimes:jpeg,png,jpg,gif,svg,jpg,png|max:2048',
 
             ]);
             if ($request->hasFile('foto')) {
@@ -139,7 +139,7 @@ class KontenProgramController extends Controller
 
             return response()->json([
                 'status' => 'success',
-                'message' => 'Konten program has been removed',
+                'message' => 'Konten Program Berhasil Dihapus',
                 'url' => $url,
             ]);
         } catch (\Exception $e) {

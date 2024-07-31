@@ -96,7 +96,7 @@ class DashboardController extends Controller
                 'totalArsip' => $totalArsip,
                 'totalDonatur' => $totalDonatur,
                 'totalProgram' => $totalProgram,
-                'totalUser' => $totalUser,
+                'totalUser' => $totalUser-1,
                 'totalDonasi' => $totalDonasiFormatted,
             ],
             'donationData' => $donationData,

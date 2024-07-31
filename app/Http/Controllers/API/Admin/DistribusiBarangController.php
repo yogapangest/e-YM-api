@@ -14,31 +14,41 @@ use TCPDF;
 class DistribusiBarangController extends Controller
 {
 
-    public function index($distribusis_id)
-    {
-        try {
-            $distribusi = Distribusi::findOrFail($distribusis_id);
-            $distribusibarangs = DistribusiBarang::where('distribusis_id', $distribusis_id)->get();
-            $program = $distribusi->program->first();
-            $url = '/admin/distribusibarangs';
+    public function index($distribusis_id, Request $request)
+{
+    try {
+        $distribusi = Distribusi::findOrFail($distribusis_id);
 
+        // Ambil parameter pencarian dari query string
+        $search = $request->query('search', '');
 
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Get data distribusi barang successful',
-                'distribusi' => $distribusi,
-                'distribusibarangs' => $distribusibarangs,
-                'program' => $program,
-                'url' => $url,
-            ]);
-        } catch (Exception $e) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Failed to get distribusi barang',
-                'error' => $e->getMessage()
-            ], 500);
-        }
+        // Gunakan query builder untuk mencari berdasarkan nama_barang
+        $distribusibarangs = DistribusiBarang::where('distribusis_id', $distribusis_id)
+            ->where(function($query) use ($search) {
+                $query->where('nama_barang', 'like', '%' . $search . '%');
+            })
+            ->get();
+
+        $program = $distribusi->program->first();
+        $url = '/admin/distribusibarangs';
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Get data distribusi barang successful',
+            'distribusi' => $distribusi,
+            'distribusibarangs' => $distribusibarangs,
+            'program' => $program,
+            'url' => $url,
+        ]);
+    } catch (Exception $e) {
+        return response()->json([
+            'status' => 'error',
+            'message' => 'Failed to get distribusi barang',
+            'error' => $e->getMessage()
+        ], 500);
     }
+}
+
 
 
     public function store(Request $request)
@@ -195,7 +205,7 @@ class DistribusiBarangController extends Controller
 
             return response()->json([
                 'status' => 'success',
-                'message' => 'distribusi barang has been removed',
+                'message' => 'Distribusi Barang Berhasil Dihapus',
                 'url' => $url,
             ]);
         } catch (\Exception $e) {

@@ -22,7 +22,8 @@
                             <div class="col-lg-4">
                                 <div class="card card-statistic-1">
                                     <div class="card-icon bg-danger">
-                                        <i class="far fa-file"></i>
+                                        <img src="{{ asset('assets/img/rupiah2.png') }}" width="50" height="50"
+                                            alt="Rupiah Icon">
                                     </div>
                                     <div class="card-wrap">
                                         <div class="card-header">
@@ -52,8 +53,11 @@
                                 <div class="card card-statistic-1">
                                     <div class="card-wrap">
                                         <div class="card-icon bg-danger">
-                                            <i class="fas fa-dollar-sign"></i>
+                                            <img src="{{ asset('assets/img/rupiah2.png') }}" width="50" height="50"
+                                                alt="Rupiah Icon">
                                         </div>
+
+
                                         <div class="card-header">
                                             <h4>Jumlah Donasi</h4>
                                         </div>
@@ -96,7 +100,7 @@
                                 <div class="card-header">
                                     <h4>Jumlah Donatur</h4>
                                 </div>
-                                <div class="card-body" id="totalDonatur">
+                                <div class="card-body" id="totalGuest">
                                     <!-- Jumlah Donatur akan diisi dengan JavaScript -->
                                 </div>
                             </div>
@@ -138,7 +142,7 @@
                     </div>
 
 
-                    <div class="col-lg-3 col-md-6 col-sm-12 col-12">
+                    {{-- <div class="col-lg-3 col-md-6 col-sm-12 col-12">
                         <div class="card card-statistic-1">
                             <div class="card-icon bg-warning">
                                 <i class="far fa-user"></i>
@@ -147,12 +151,12 @@
                                 <div class="card-header">
                                     <h4>Total Guest</h4>
                                 </div>
-                                <div class="card-body" id="totalGuest">
+                                <div class="card-body" id="totalDonatur">
                                     <!-- Total Guest akan diisi dengan JavaScript -->
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </div> --}}
 
                 </div>
             @endif

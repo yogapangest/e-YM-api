@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\API\Admin;
 
 use Exception;
+use Carbon\Carbon;
 use App\Models\Program;
 use App\Models\Distribusi;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\File;
@@ -13,28 +15,92 @@ use Illuminate\Validation\ValidationException;
 
 class DistribusiController extends Controller
 {
-    public function index()
-    {
-        try {
-            $distribusis = Distribusi::with('Program')->get();
-            $url = '/admin/distribusi';
+    public function index(Request $request)
+{
+    try {
+        $query = $request->input('q');
 
-            return response()->json([
-                'status' => 'succes',
-                'message' => 'Get data distribusi successfull',
-                'distribusi' => $distribusis,
-                'url' => $url,
-            ]);
-        } catch (Exception $e) {
-            Log::error('Failed to get Distribusi: ' . $e->getMessage());
+        // Mulai query distribusi
+        $distribusis = Distribusi::with('program');
 
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Failed to get distribusi',
-                'error' => $e->getMessage()
-            ], 500);
+        // Log query untuk debugging
+        Log::info('Search query: ' . $query);
+
+        // Tambahkan logika pencarian jika ada parameter q
+        if ($query) {
+            $queryDate = null;
+            $queryMonth = null;
+            $queryYear = null;
+
+            // Attempt to parse query as a date
+            try {
+                $queryDate = Carbon::createFromFormat('d F Y', $query)->format('Y-m-d');
+                Log::info('Parsed date: ' . $queryDate);
+            } catch (\Exception $e) {
+                Log::info('Failed to parse date: ' . $e->getMessage());
+            }
+
+            // Attempt to parse query as a month
+            try {
+                $queryMonth = Carbon::createFromFormat('F Y', $query)->format('Y-m');
+                Log::info('Parsed month: ' . $queryMonth);
+            } catch (\Exception $e) {
+                Log::info('Failed to parse month: ' . $e->getMessage());
+            }
+
+            // Attempt to parse query as a year
+            try {
+                $queryYear = Carbon::createFromFormat('Y', $query)->format('Y');
+                Log::info('Parsed year: ' . $queryYear);
+            } catch (\Exception $e) {
+                Log::info('Failed to parse year: ' . $e->getMessage());
+            }
+
+            // Apply search criteria
+            $distribusis = $distribusis->where(function($q) use ($query, $queryDate, $queryMonth, $queryYear) {
+                $q->where('tempat', 'LIKE', '%' . $query . '%')
+                  ->orWhere('penerima_manfaat', 'LIKE', '%' . $query . '%')
+                  ->orWhere('anggaran', 'LIKE', '%' . $query . '%')
+                  ->orWhere('pengeluaran', 'LIKE', '%' . $query . '%')
+                  ->orWhere('sisa', 'LIKE', '%' . $query . '%')
+                  ->orWhereHas('program', function($q) use ($query) {
+                      $q->where('nama_program', 'LIKE', '%' . $query . '%');
+                  });
+
+                if ($queryDate) {
+                    $q->orWhere(DB::raw("DATE_FORMAT(tanggal, '%Y-%m-%d')"), 'LIKE', '%' . $queryDate . '%');
+                }
+
+                if ($queryMonth) {
+                    $q->orWhere(DB::raw("DATE_FORMAT(tanggal, '%Y-%m')"), 'LIKE', '%' . $queryMonth . '%');
+                }
+
+                if ($queryYear) {
+                    $q->orWhere(DB::raw("DATE_FORMAT(tanggal, '%Y')"), 'LIKE', '%' . $queryYear . '%');
+                }
+            });
         }
+
+        // Dapatkan hasil query
+        $distribusis = $distribusis->get();
+        $url = '/admin/distribusi';
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Get data distribusi successful',
+            'distribusi' => $distribusis,
+            'url' => $url,
+        ]);
+    } catch (Exception $e) {
+        Log::error('Failed to get Distribusi: ' . $e->getMessage());
+
+        return response()->json([
+            'status' => 'error',
+            'message' => 'Failed to get distribusi',
+            'error' => $e->getMessage()
+        ], 500);
     }
+}
 
     public function store(Request $request)
     {
@@ -179,13 +245,13 @@ class DistribusiController extends Controller
 
             return response()->json([
                 'status' => 'success',
-                'message' => 'Distribusi has been removed',
+                'message' => 'Distribusi Berhasil Dihapus',
                 'url' => $url,
             ]);
         } catch (\Exception $e) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'Failed to remove distribusi',
+                'message' => 'Gagal Untuk Menghapus Data Distribusi',
                 'error' => $e->getMessage()
             ], 500);
         }

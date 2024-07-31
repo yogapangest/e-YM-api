@@ -84,8 +84,7 @@
                                         Tambah Distribusi
                                     </button>
                                 </div>
-                                <script src="{{ asset('js/distribusi.js') }}"></script>
-                                <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+
                             </form>
                         </div>
                     </div>
@@ -93,9 +92,20 @@
             </div>
         </section>
     </div>
+    <script src="{{ asset('js/distribusi.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
     <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4="
         crossorigin="anonymous"></script>
-    </script>
+    <!-- Sertakan SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+
+    <!-- Sertakan file JavaScript eksternal -->
+    <script src="{{ asset('js/distribusi.js') }}"></script>
+
+    <!-- Sertakan jQuery -->
+    <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4="
+        crossorigin="anonymous"></script>
+
     <script>
         $(document).ready(function() {
 
@@ -123,25 +133,76 @@
             $('#DistribusiForm').submit(function(event) {
                 event.preventDefault();
 
-                var formData = new FormData(this);
+                let isValid = true;
+                let fields = [{
+                        id: "programs_id",
+                        message: "Program harus diisi"
+                    },
+                    {
+                        id: "tanggal",
+                        message: "Tanggal harus diisi"
+                    },
+                    {
+                        id: "tempat",
+                        message: "Tempat harus diisi"
+                    },
+                    {
+                        id: "penerima_manfaat",
+                        message: "Penerima Manfaat harus diisi"
+                    },
+                    {
+                        id: "anggaran_display",
+                        message: "Anggaran harus diisi"
+                    },
+                    {
+                        id: "file",
+                        message: "File harus diisi"
+                    },
+                ];
 
-                $.ajax({
-                    url: '/api/admin/manajemen/distribusi',
-                    method: 'POST',
-                    data: formData,
-                    processData: false,
-                    contentType: false,
-                    headers: {
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    },
-                    success: function(data) {
-                        window.location.href = '/apps/distribusi/view';
-                    },
-                    error: function(xhr, status, error) {
-                        console.error('There has been a problem with your AJAX operation:',
-                            error);
+                for (let field of fields) {
+                    let element = document.getElementById(field.id);
+                    if (!element.value) {
+                        isValid = false;
+                        Swal.fire({
+                            icon: "error",
+                            title: "Oops...",
+                            text: field.message,
+                            confirmButtonColor: "#6777ef",
+                        });
+                        element.focus();
+                        break; // Stop checking further fields after the first empty field is found
                     }
-                });
+                }
+
+                if (isValid) {
+                    var formData = new FormData($('#DistribusiForm')[0]);
+
+                    $.ajax({
+                        url: '/api/admin/manajemen/distribusi',
+                        method: 'POST',
+                        data: formData,
+                        processData: false,
+                        contentType: false,
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        },
+                        success: function(data) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Sukses',
+                                text: 'Data berhasil disimpan',
+                                confirmButtonColor: '#6777ef',
+                            }).then(function() {
+                                window.location.href = '/apps/distribusi/view';
+                            });
+                        },
+                        error: function(xhr, status, error) {
+                            console.error('There has been a problem with your AJAX operation:',
+                                error);
+                        }
+                    });
+                }
             });
         });
     </script>
